@@ -10,8 +10,9 @@ lmk=Motor(Port.F)
 lm=Motor(Port.D, positive_direction=Direction.CLOCKWISE)
 rm=Motor(Port.E)
 radius = 62,4
-#drb = DriveBase(lm, rm, 55, 130) #alt noch ändern auf neuer roboter  
+drb = DriveBase(lm, rm, 55, 130) #alt noch ändern auf neuer roboter  
 hub = PrimeHub()
+drb.use_gyro(True)
 
 
 def lkmmove(distance,speed):
