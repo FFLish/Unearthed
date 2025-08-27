@@ -7,85 +7,11 @@ import umath as m
 from pybricks.tools import multitask, run_task
 
 hub = PrimeHub()
-
-# Definition der Ziffern als 5x5-Matrizen
-digits = {
-    "1": [
-        [0,1,1,0,0],
-        [1,1,1,0,0],
-        [0,1,1,0,0],
-        [0,1,1,0,0],
-        [1,1,1,1,1],
-    ],
-    "2": [
-        [1,1,1,1,0],
-        [0,0,0,0,1],
-        [0,1,1,1,0],
-        [1,0,0,0,0],
-        [1,1,1,1,1],
-    ],
-    "3": [
-        [1,1,1,1,0],
-        [0,0,0,0,1],
-        [0,1,1,1,0],
-        [0,0,0,0,1],
-        [1,1,1,1,0],
-    ],
-    "4": [
-        [1,0,0,1,0],
-        [1,0,0,1,0],
-        [1,1,1,1,1],
-        [0,0,0,1,0],
-        [0,0,0,1,0],
-    ],
-    "5": [
-        [1,1,1,1,1],
-        [1,0,0,0,0],
-        [1,1,1,1,0],
-        [0,0,0,0,1],
-        [1,1,1,1,0],
-    ],
-    "6": [
-        [0,1,1,1,0],
-        [1,0,0,0,0],
-        [1,1,1,1,0],
-        [1,0,0,0,1],
-        [0,1,1,1,0],
-    ],
-    "7": [
-        [1,1,1,1,1],
-        [0,0,0,1,0],
-        [0,0,1,0,0],
-        [0,1,0,0,0],
-        [1,0,0,0,0],
-    ],
-    "8": [
-        [0,1,1,1,0],
-        [1,0,0,0,1],
-        [0,1,1,1,0],
-        [1,0,0,0,1],
-        [0,1,1,1,0],
-    ],
-    "9": [
-        [0,1,1,1,0],
-        [1,0,0,0,1],
-        [0,1,1,1,1],
-        [0,0,0,0,1],
-        [0,1,1,1,0],
-    ],
-}
-def show_digit(digit):
-    # Zeigt die angepasste Ziffer auf dem Hub-Display an
-    d = str(digit)
-    if d in digits:
-        hub.display.image(digits[d])
-    else:
-        hub.display.number(digit)
-
+hub.system.set_stop_button({Button.BLUETOOTH})
 lmA=Motor(Port.E, positive_direction=Direction.COUNTERCLOCKWISE)
-rmB=Motor(Port.A)
+rmB=Motor(Port.D)
 lmk=Motor(Port.F)
-rmk=Motor(Port.D)
+rmk=Motor(Port.B)
 radius = 2.8
 drb = DriveBase(lmA, rmB, 56, 132)
 strecke = (m.radians(lmA.angle())*radius+m.radians(rmB.angle())*radius)/2
@@ -132,7 +58,7 @@ def drive(xnewpos,ynewpos,speed,speed2=100):
         winkel = m.atan(gegenkathete/ankathete)
         print("x:", round(x, 2), " y:", round(y, 2), "winkel",winkel,"ankathete",ankathete,"gegenkathete",gegenkathete,"zufahrenstrecke ",zufahrenstrecke)
         zufahrenstrecke = m.sqrt(ankathete**2+gegenkathete**2)
-        if ankathete/abs(ankathete)==-1:# und gegenkathete/abs(gegenkathete)==-1:
+        if ankathete/abs(ankathete)==-1:# and gegenkathete/abs(gegenkathete)==-1:
             lmA.run(speed2-(winkel+m.pi-m.radians(hub.imu.heading()))*-turnspeed)
             rmB.run(speed2+(winkel+m.pi-m.radians(hub.imu.heading()))*-turnspeed)
 #            turndrive = (winkel+m.pi-m.radians(hub.imu.heading())*-turnspeed)*20
@@ -254,169 +180,185 @@ def drivedis(speed,distance,speed2):
 #drb.settings(200,700,150,700)
 
 #drb.straight(100,Stop.HOLD,True)
-def drb_m(distance, speed, acceleration=900, second_function=None, dist2=0, speed2=0):
-    drb.settings(speed, acceleration, 800, 500)
-    drb.straight(distance, Stop.HOLD, False)
+def drb_m(distance,speed,acceleration=900,second_function = None,dist2=0,speed2=0):
+    drb.settings(speed,acceleration,800,500)#max straight_speed=97(argument.1)
+    drb.straight(distance,Stop.HOLD,False)
     if second_function:
-        second_function(dist2, speed2)
+        second_function(dist2,speed2)
     while not drb.done():
+        if Button.RIGHT in hub.buttons.pressed():
+            raise SystemExit("ENDE")
         if Button.BLUETOOTH in hub.buttons.pressed():
-            raise CompleteExit()  # <-- Zurück zum Menü, wenn Bluetooth gedrückt wird
+            raise CompleteExit("ENDE GELÄNDE!")
 
-def drb_t(angle, speed, acceleration=500, second_function=None, dist2=0, speed2=0):
-    drb.settings(400, 400, speed, acceleration)
-    drb.turn(angle, Stop.HOLD, False)
+def drb_t(angle,speed,acceleration=500,second_function = None,dist2=0,speed2=0):
+    #drb.use_gyro(True)
+    print(hub.imu.heading())
+    drb.settings(400,400,speed,acceleration)
+    drb.turn(angle,Stop.HOLD,False)
     if second_function:
-        second_function(dist2, speed2)
+        second_function(dist2,speed2)
     while not drb.done():
+        if Button.RIGHT in hub.buttons.pressed():
+            raise SystemExit("ENDE")
         if Button.BLUETOOTH in hub.buttons.pressed():
-            raise CompleteExit()  # <-- Zurück zum Menü, wenn Bluetooth gedrückt wird
+            raise CompleteExit("ENDE GELÄNDE!")
 
-def lmkmove(distance, speed):
-    lmk.reset_angle(0)
-    while abs(lmk.angle()) < distance:
-        if Button.BLUETOOTH in hub.buttons.pressed():
-            raise CompleteExit()  # <-- Zurück zum Menü, wenn Bluetooth gedrückt wird
-        lmk.run(speed)
-    lmk.brake()
+#drb.use_gyro(True)
+'''print(drb.heading_control.pid()) #before: 21242, 0, 5310, 34, 63
 
-def rmkmove(distance, speed):
-    rmk.reset_angle(0)
-    while abs(rmk.angle()) < distance:
-        if Button.BLUETOOTH in hub.buttons.pressed():
-            raise CompleteExit()  # <-- Zurück zum Menü, wenn Bluetooth gedrückt wird
-        rmk.run(speed)
-    rmk.brake()
+drb.heading_control.pid(21242,0,5310,3) #before: 21242, 0, 5310, 34, 63
+print(drb.heading_control.pid()) #before: 21242, 0, 5310, 34, 63
+'''
 '''rmkmove(600,300)
 rmkmove(600,-300)'''
-#PROGRAMMSTART
+#START PROGRAMM
 #1 Hochschieben
 #drb.turn(-90)
 #drb_t(90,800,500,lmkmove,500,50)
 def run1():
-    show_digit(1)
-    drb_m(300, 300)
-    drb_t(90, 200)
-    drb_m(200, 300)
+    try:
+        drb_m(500,500)
+    except SystemExit:
+        print("This was a stop!")
+    drb.stop()
+    global var
+    var = int(hub_menu("2","3","4","5","6","7","8","9","10","1"))
 
 def run2():
-    show_digit(2)
-    drb_m(200, 300)
-    lmkmove(360, 200)
-    drb_m(-200, 300)
-    lmkmove(-360, 200)
+    try:
+        drb_m(500,500)
+    except SystemExit:
+        print("This was a stop!")
+    drb.stop()
+    global var
+    var = int(hub_menu("3","4","5","6","7","8","9","10","1","2"))
 
 def run3():
-    show_digit(3)
-    drb_t(-90, 200)
-    drb_m(150, 300)
-    drb_t(90, 200)
-    drb_m(150, 300)
-
+    try:
+        drb_m(500,500)
+    except SystemExit:
+        print("This was a stop!")
+    drb.stop()
+    global var
+    var = int(hub_menu("4","5","6","7","8","9","10","1","2","3"))
 def run4():
-    show_digit(4)
-    drb_m(100, 300)
-    rmkmove(360, 200)
-    drb_t(45, 200)
-    drb_m(100, 300)
-    rmkmove(-360, 200)
-
+    try:
+        drb_m(250,300,500)
+        drb.stop()
+    except SystemExit:
+        print("This was a stop!")
+    drb.stop()
+    global var
+    var = int(hub_menu("5","6","7","8","9",10,"1","2","3","4"))
 def run5():
-    show_digit(5)
-    drb_m(250, 300)
-    drb_t(-180, 200)
-    drb_m(-250, 300)
-
+    try:
+        drb_m(570,400,500)
+        drb.stop()
+    except SystemExit:
+        print("This was a stop!")
+    drb.stop()
+    global var
+    var = int(hub_menu("6","7","8","9",10,"1","2","3","4","5"))
 def run6():
-    show_digit(6)
-    lmkmove(360, 200)
-    drb_m(100, 300)
-    lmkmove(-360, 200)
-    drb_m(-100, 300)
-
+    try:
+       lmkmove(100,100)
+       drb_m(50,500)
+       drb.stop()
+    except SystemExit:
+        print("This was a stop!")
+    drb.stop()
+    global var
+    var = int(hub_menu("7","8","9",10,"1","2","3","4","5","6"))
 def run7():
-    show_digit(7)
-    drb_m(150, 300)
-    drb_t(90, 200)
-    drb_m(150, 300)
-    drb_t(-90, 200)
-    drb_m(150, 300)
+    try:
+       drb_m(-500,900)
+    
+       drb.stop()
+    except SystemExit:
+        print("This was a stop!")
+    drb.stop()
+    global var
+    var = int(hub_menu("8","9",10,"1","2","3","4","5","6","7"))
 
 def run8():
-    show_digit(8)
-    drb_m(100, 300)
-    rmkmove(360, 200)
-    drb_m(100, 300)
-    rmkmove(-360, 200)
-    drb_m(-200, 300)
+    try:
+      drb_m(200,300)
+      drb.stop()
+    except SystemExit:
+        print("This was a stop!")
+    drb.stop()
+    global var
+    var = int(hub_menu("9",10,"1","2","3","4","5","6","7","8"))
+
 
 def run9():
-    show_digit(9)
-    drb_m(200, 300)
-    drb_t(90, 200)
-    drb_m(100, 300)
-    drb_t(90, 200)
-    drb_m(200, 300)
+    try:
+        drb_m(50000,900,1500)
+        drb.stop()
+    except SystemExit:
+        print("This was a stop!")
+    drb.stop()
+    global var
+    var = int(hub_menu(10,"1","2","3","4","5","6","7","8","9"))
 
-class CompleteExit(Exception):
-    pass
+def run10():
+    try:
+        drb_m(-50000,900,1500)
+    except SystemExit:
+        print("This was a stop!")
+    drb.stop()
+    global var
+    var = int(hub_menu("1","2","3","4","5","6","7","8","9",10))
+def run11():
+    try:
 
-def menu():
-    var = int(hub_menu("1","2","3","4","5","6","7","8","9"))
-    show_digit(var)
-    return var
+    except SystemExit:
+        print("This was a stop!")
+    drb.stop()
+    global var
+    var = int(hub_menu("1","2","3","4","5","6","7","8","9",10,))
 
-def master_menu():
-    print("Master-Menü gestartet!")
+
+var = int(hub_menu("1","2","3","4","5","6","7","8","9",10,))
+print(var)
+
+while True:
+    if var ==1:
+        print("run1")
+        run1() 
+    if var ==2:
+        print("run2")
+        run2()
+    if var==3:
+        print("run3")
+        run3()
+    if var==4:
+        print("run4")
+        run4()
+    if var==5:
+        print("run5")
+        run5()
+    if var==6:
+        print("run6")
+        run6()
+    if var==7:
+        print("run7")
+        run7()
+    if var==8:
+        print("run8")
+        run8()
+    if var==9:
+        print("run9")
+        run9()
+    if var==10:
+        print("run10")
+        run10()
+
+print(x,y)
+
+async def counter():
+    a=1   
     while True:
-        # Prüfen, ob der Bluetooth-Knopf im Menü gedrückt wird → Programm beenden
-        if Button.BLUETOOTH in hub.buttons.pressed():
-            print("Bluetooth-Knopf im Master-Menü gedrückt. Programm wird beendet.")
-            hub.display.text("Ende")
-            wait(2000)
-            break  # Beendet die while-Schleife und damit das Programm
-        try:
-            var = menu()
-            if var == 1:
-                print("run1")
-                run1()
-            elif var == 2:
-                print("run2")
-                run2()
-            elif var == 3:
-                print("run3")
-                run3()
-            elif var == 4:
-                print("run4")
-                run4()
-            elif var == 5:
-                print("run5")
-                run5()
-            elif var == 6:
-                print("run6")
-                run6()
-            elif var == 7:
-                print("run7")
-                run7()
-            elif var == 8:
-                print("run8")
-                run8()
-            elif var == 9:
-                print("run9")
-                run9()
-            else:
-                print("Ungültige Auswahl.")
-                wait(1000)
-        except CompleteExit:
-            print("Run abgebrochen, zurück zum Master-Menü.")
-            wait(1000)
-        except SystemExit:
-            print("Beenden angefordert. Zurück zum Master-Menü.")
-            wait(1000)
-        except Exception as e:
-            print("Fehler:", e)
-            hub.display.text("Err")
-            wait(3000)
-
-print("Programm gestartet!")
-master_menu()
+        print(a)
+        a=1
