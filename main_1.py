@@ -74,8 +74,8 @@ digits = {
     ],
 }
 hub.system.set_stop_button({Button.BLUETOOTH})
-lmA=Motor(Port.F, positive_direction=Direction.COUNTERCLOCKWISE)
-rmB=Motor(Port.C)
+lmA=Motor(Port.C, positive_direction=Direction.COUNTERCLOCKWISE)
+rmB=Motor(Port.F)
 lmk=Motor(Port.D)
 rmk=Motor(Port.B)
 radius = 31.2
@@ -88,28 +88,25 @@ y = 0
 var = 0
 drb.use_gyro(True)
 
-def zahl_anzeigen(zahl):
-    s = str(zahl)
-    if s in digits:
-        hub.display.icon(digits[s])
-    else:
-        hub.display.clear()
-
-def menu(starting_number):
+def menu(starting_number=1):
     showing = starting_number
-hub = PrimeHub()
+    while True:
+        if hub.buttons.pressed()=={Button.LEFT}:
+            while hub.buttons.pressed()=={Button.LEFT}:
+                continue
+            showing -=1
+            print(showing)
+        elif hub.buttons.pressed()=={Button.RIGHT}:
+            while hub.buttons.pressed()=={Button.RIGHT}:
+                continue
+            showing +=1
+            print(showing)
+        elif hub.buttons.pressed()=={Button.CENTER}:
+            while hub.buttons.pressed()=={Button.CENTER}:
+                continue
+            return showing
 
-while True:
-
-
-    if hub.buttons.pressed()==Button.LEFT:
-        hub.light.on('red')
-
-    wait(100)
-
-#        zahl_anzeigen(showing)
-
-menu()
+#print(menu())
 def position_aktualisieren():
     global alteStrecke, x, y
     strecke = (m.radians(lmA.angle())*radius+m.radians(rmB.angle())*radius)/2
@@ -302,8 +299,8 @@ def run1():
     drb.stop()
     lmk.brake()
     rmk.brake()
+    global var
     var = int(hub_menu("2","3","4","5","6","7","8","9","1"))
-    zahl_anzeigen(var)
     print("var")
 
 def run2():
@@ -312,9 +309,10 @@ def run2():
     except SystemExit:
         print("This was a stop!")
     drb.stop()
+    lmk.brake()
+    rmk.brake()
     global var
     var = int(hub_menu("3","4","5","6","7","8","9","1","2",))
-    zahl_anzeigen(var)
 
 
 def run3():
@@ -323,9 +321,10 @@ def run3():
     except SystemExit:
         print("This was a stop!")
     drb.stop()
+    lmk.brake()
+    rmk.brake()
     global var
     var = int(hub_menu("4","5","6","7","8","9","1","2","3"))
-    zahl_anzeigen(var)
 
 
 def run4():
@@ -335,9 +334,10 @@ def run4():
     except SystemExit:
         print("This was a stop!")
     drb.stop()
+    lmk.brake()
+    rmk.brake()
     global var
-    var = int(hub_menu("5","6","7","8","9""1","2","3","4"))
-    zahl_anzeigen(var)
+    var = int(hub_menu("5","6","7","8","9","1","2","3","4"))
 
 
 def run5():
@@ -347,62 +347,68 @@ def run5():
     except SystemExit:
         print("This was a stop!")
     drb.stop()
+    lmk.brake()
+    rmk.brake()
     global var
     var = int(hub_menu("6","7","8","9","1","2","3","4","5"))
-    zahl_anzeigen(var)
+    
 
 
 def run6():
     try:
-       lmkmove(100,100)
-       drb_m(50,500)
-       drb.stop()
+
+        lmkmove(100,100)
+        drb_m(50,500)
+        drb.stop()
     except SystemExit:
         print("This was a stop!")
     drb.stop()
+    lmk.brake()
+    rmk.brake()
     global var
     var = int(hub_menu("7","8","9","1","2","3","4","5","6"))
-    zahl_anzeigen(var)
 
 
 def run7():
     try:
-       drb_m(-500,900)
-       drb.stop()
+        drb_m(-500,900)
+        drb.stop()
+        lmk.brake()
+        rmk.brake()
     except SystemExit:
         print("This was a stop!")
     drb.stop()
     global var
     var = int(hub_menu("8","9","1","2","3","4","5","6","7"))
-    zahl_anzeigen(var)
 
 
 def run8():
     try:
-      drb_m(200,300)
-      drb.stop()
+        drb_m(200,300)
+        drb.stop()
+        lmk.brake()
+        rmk.brake()
     except SystemExit:
         print("This was a stop!")
     drb.stop()
     global var
     var = int(hub_menu("9","1","2","3","4","5","6","7","8"))
-    zahl_anzeigen(var)
 
 
 def run9():
     try:
         drb_m(50000,900,1500)
         drb.stop()
+        lmk.brake()
+        rmk.brake()
     except SystemExit:
         print("This was a stop!")
     drb.stop()
     global var
     var = int(hub_menu("1","2","3","4","5","6","7","8","9"))
-    zahl_anzeigen(var)
 
 
 var = int(hub_menu("1","2","3","4","5","6","7","8","9",))
-zahl_anzeigen(var)
 print(var)
 
 while True:
