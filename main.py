@@ -321,7 +321,9 @@ def run2():
 
 def run3():
     try:
-        drb_m(500,500)
+        drb_m(590,400)
+        rmkmove(1000,500)
+        drb_m(-590,400)
     except SystemExit:
         print("This was a stop!")
     drb.stop()
