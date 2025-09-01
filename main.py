@@ -243,7 +243,6 @@ def drivedis(speed,distance,speed2):
 
 
 def drb_m(distance,speed,acceleration=900,second_function = None,dist2=0,speed2=0):
-    drb.use_gyro(False)
     #drb.heading_control.enabled = True
     print("start function")
     drb.settings(speed,acceleration,90, 500)
@@ -265,7 +264,6 @@ def drb_m(distance,speed,acceleration=900,second_function = None,dist2=0,speed2=
 
 
 def drb_t(angle,speed,acceleration=500,second_function = None,dist2=0,speed2=0):
-    drb.use_gyro(False)
     #drb.heading_control.enabled = True
     print(hub.imu.heading())
     drb.settings(400,400,speed,acceleration)
@@ -305,7 +303,13 @@ def run1():
 
 def run2():
     try:
-        drb_m(500,500)
+        drb_m(610, 400)
+        drb_t(-49, 400)
+        drb_m(270, 400)
+        drb_t(-84, 400)
+        drb_m(520, 400)
+        drb_t(-48, 400)
+        drb_m(420, 400)
     except SystemExit:
         print("This was a stop!")
     drb.stop()
