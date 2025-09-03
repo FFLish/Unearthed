@@ -41,55 +41,6 @@ def menu(starting_number=1):
                 continue
             return showing
 
-#print(menu())
-def position_aktualisieren():
-    global alteStrecke, x, y
-    strecke = (m.radians(lmA.angle())*radius+m.radians(rmB.angle())*radius)/2
-    sdStrecke = strecke - alteStrecke
-    richtung = m.radians(hub.imu.heading())
-    deltaX = m.cos(richtung) * sdStrecke
-    deltaY = m.sin(richtung) * sdStrecke
-    x += deltaX
-    y += deltaY
-    alteStrecke = strecke
-
-
-def drive(xnewpos,ynewpos,speed,speed2=100):
-    global x
-    global y
-    acceleration=10
-    turnspeed = speed*3/4
-    ankathete = xnewpos-x
-    gegenkathete = ynewpos-y
-    zufahrenstrecke = m.sqrt(ankathete**2+gegenkathete**2)
-    while zufahrenstrecke>0.7:
-        if abs(speed2)/50>zufahrenstrecke:
-            speed2 = zufahrenstrecke*50*speed2/abs(speed2)
-        elif speed2<speed:
-            speed2 = speed2+acceleration
-        elif speed2>speed:
-            speed2=speed-acceleration
-        position_aktualisieren()
-        ankathete = xnewpos-x
-        gegenkathete = ynewpos-y
-        winkel = m.atan(gegenkathete/ankathete)
-        zufahrenstrecke = m.sqrt(ankathete**2+gegenkathete**2)
-        if ankathete/abs(ankathete)==-1:
-            lmA.run(speed2-(winkel+m.pi-m.radians(hub.imu.heading()))*-turnspeed)
-            rmB.run(speed2+(winkel+m.pi-m.radians(hub.imu.heading()))*-turnspeed)
-        else:
-            lmA.run(speed2-(winkel-m.radians(hub.imu.heading()))*-turnspeed)
-            rmB.run(speed2+(winkel-m.radians(hub.imu.heading()))*-turnspeed)
-    lmA.brake()
-    rmB.brake()
-
-
-def heading():
-    if hub.imu.heading()>0:
-        heading = abs(hub.imu.heading())%360
-    else:
-        heading = 360-(abs(hub.imu.heading())%360)
-    return heading
 
 
 def lmkmove(distance,speed):
@@ -105,29 +56,29 @@ def rmkmove(distance,speed):
         rmk.run(speed)
     rmk.brake()
 
-def drb_m(distance,speed,acceleration=900,second_function = None,dist2=0,speed2=0):
 
+
+def drb_m(distance,speed,acceleration=900,second_function = None ,dist2=0,speed2=0):
     print("start function")
     drb.settings(speed,acceleration,90, 500)
     print("finish settings")
     drb.straight(distance,Stop.HOLD,False)
     print("move done")
-    
     if second_function:
         second_function(dist2,speed2)
     while not drb.done():
-    
-    if Button.RIGHT in hub.buttons.pressed():
-        raise SystemExit("ENDE")
-    if Button.CENTER in hub.buttons.pressed():
-        wait(1)
-        raise SystemExit("ENDE GELÄNDE!")
+        if Button.RIGHT in hub.buttons.pressed():
+            raise SystemExit("ENDE")
+        if Button.CENTER in hub.buttons.pressed():
+            wait(1)
+            '''global var
+            var=var-1'''
+            raise SystemExit("ENDE GELÄNDE!")
             
 
 
 
 def drb_t(angle,speed,acceleration=500,second_function = None,dist2=0,speed2=0):
-    #drb.heading_control.enabled = True
     print(hub.imu.heading())
     drb.settings(400,400,speed,acceleration)
     drb.turn(angle,Stop.HOLD,False)
@@ -198,8 +149,18 @@ def run3():
 
 def run4():
     try:
-        drb_m(250,300)
-        drb.stop()
+        drb_m(620, 400)
+        drb_t(30, 400)
+        drb_m(170, 400)
+        lmkmove(100, 500)
+        drb_m(40, 500)
+        rmkmove(180, 500)
+        drb_m(40, 500)
+        rmkmove(180, -500)
+        drb_t(46, 400)
+        drb_m(-144, 400)
+        drb_t(70, 400)
+        drb_m(613, 400)
     except SystemExit:
         print("This was a stop!")
     drb.stop()
@@ -318,4 +279,4 @@ async def counter():
         a=1
 
 
-print("neu")
+print("neu") 
