@@ -105,95 +105,23 @@ def rmkmove(distance,speed):
         rmk.run(speed)
     rmk.brake()
 
-
-def move(speed,acceleration, endbedingung, distance = 0,speed2=0,brake1 = True):
-    weiterfahren = True
-    lmA.reset_angle(0)
-    rmB.reset_angle(0)
-    gyrostart=hub.imu.heading()
-    gyroende=hub.imu.heading()
-    while weiterfahren:
-        togo = distance-abs(lmA.angle())
-        if abs(speed2)/5>togo and endbedingung == "distance":
-            speed2 = togo*5*speed2/abs(speed2)
-        elif speed2<speed:
-            speed2 = speed2+acceleration
-        elif speed2>speed:
-            speed2 = speed2-acceleration           
-        aditional = (rmB.angle())-(lmA.angle())
-        gyro=gyrostart-hub.imu.heading()
-        gyroextra=gyroende-hub.imu.heading()
-        lmA.run(speed2*1+aditional*0+(gyro*3-gyroextra*1))    
-        rmB.run(speed2*1-aditional*0-(gyro*3-gyroextra*1))
-        gyroende=hub.imu.heading()
-        if endbedingung == 2:
-            weiterfahren = ls2.reflection() > 9
-        elif endbedingung == 1:
-            weiterfahren = distance > abs(lmA.angle())
-    if brake1== True:
-        lmA.hold()
-        rmB.hold()
-
-
-def turn(speed, angle):
-    acceleration = 5
-    speed2=100
-    stopdis = 10
-    while abs(heading()-angle)>1:
-        position_aktualisieren()
-        if heading()-angle>180:
-            if abs(speed2)/stopdis>360-(heading()+angle)%360:
-                speed2 = (360-(heading()+angle)%360)*stopdis
-            elif speed2<speed:
-                speed2 = speed2+acceleration
-            lmA.run(speed2)
-            rmB.run(-speed2)
-        elif (heading()-angle)/(abs(heading()-angle))==-1:
-            if abs(speed2)/stopdis>angle-heading():
-                speed2 = ((abs(heading()-angle))%360)*stopdis
-            elif speed2<speed:
-                speed2 = speed2+acceleration
-            lmA.run(speed2)
-            rmB.run(-speed2)
-        else:
-            if abs(speed2)/stopdis>abs(angle-heading())%360:
-                speed2 = (abs(angle-heading())%360)*stopdis
-            elif speed2<speed:
-                speed2 = speed2+acceleration
-            lmA.run(-speed2)
-            rmB.run(speed2)
-    lmA.brake()
-    rmB.brake()
-
-
-def drivedis(speed,distance,speed2):
-    global x
-    global y
-    acceleration=10
-    turnspeed = 10
-    winkel = 0
-    ankathete = m.cos(hub.imu.heading())*distance
-    gegenkathete = m.sin(hub.imu.heading())*distance
-    drive(ankathete+x,gegenkathete+y,speed,speed2)
-
-
 def drb_m(distance,speed,acceleration=900,second_function = None,dist2=0,speed2=0):
-    #drb.heading_control.enabled = True
+
     print("start function")
     drb.settings(speed,acceleration,90, 500)
     print("finish settings")
     drb.straight(distance,Stop.HOLD,False)
     print("move done")
+    
     if second_function:
         second_function(dist2,speed2)
     while not drb.done():
-        if Button.RIGHT in hub.buttons.pressed():
-            raise SystemExit("ENDE")
-        if Button.CENTER in hub.buttons.pressed():
-            wait(1)
-            '''global var
-            var=var-1'''
-            raise SystemExit("ENDE GELÄNDE!")
+    
+    if Button.RIGHT in hub.buttons.pressed():
+        raise SystemExit("ENDE")
+    if Button.CENTER in hub.buttons.pressed():
+        wait(1)
+        raise SystemExit("ENDE GELÄNDE!")
             
 
 
