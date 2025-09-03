@@ -280,18 +280,21 @@ def drb_t(angle,speed,acceleration=500,second_function = None,dist2=0,speed2=0):
             raise SystemExit("ENDE GELÄNDE!")
 
 
-def run1():
+def run1(): 
     try:
-        # drb.straight(300, Stop.HOLD, False)
-        drb_m(500,500)
-        drb_t(90,500)
-        drb_m(500,500)
-        drb_t(90,500)
-        drb_m(500,500)
-        drb_t(90,500)
-        drb_m(500,500)
-        drb_t(90,500)
-        drb_m(500,500) 
+        drb_m(800, 900)
+        drb_t(-42, 400)
+        drb_m(150, 400)
+        lmkmove(100, 400)
+        wait(100)
+        drb_m(-110, 400)
+        drb_t(42, 500)
+        drb_m(-175, 200)
+        wait(425)
+        lmkmove(390, 650)
+        lmkmove(390,-650)
+        drb_m(-530, 1000)
+
     except SystemExit:
         print("This was a stop!")
     drb.stop()
@@ -303,13 +306,10 @@ def run1():
 
 def run2():
     try:
-        drb_m(610, 400)
-        drb_t(-49, 400)
-        drb_m(270, 400)
-        drb_t(-84, 400)
-        drb_m(520, 400)
-        drb_t(-48, 400)
-        drb_m(420, 400)
+        drb_m(600,500)
+        rmkmove(500,-600)
+        drb_m(-590,500)
+
     except SystemExit:
         print("This was a stop!")
     drb.stop()
