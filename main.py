@@ -55,6 +55,7 @@ def rmkmove(distance,speed):
     while abs(rmk.angle())<distance:
         rmk.run(speed)
     rmk.brake()
+    
 
 
 
@@ -135,9 +136,28 @@ def run2():
 
 def run3():
     try:
-        drb_m(590,400)
-        rmkmove(1000,500)
-        drb_m(-590,400)
+        drb_m(250, 400)
+        drb_t(89, 400)
+        drb_m(600, 400)
+        drb_t(-30,400)
+        drb_m(180,400)
+        drb_t(-115,400)
+        drb_m(-30,400)
+        lmkmove(220,-400)
+        drb_m(80,400)
+        lmkmove(200,200)
+        wait(100)
+        #lmkmove(50,700)
+        drb_m(-100,400)
+        drb_t(30,400)
+        drb_m(-180,400)
+        drb_t(32,400)
+        drb_m(280,200)
+        wait(400)
+        drb_t(-2.5,400)
+        drb_m(-370,400)
+        rmkmove(6000,-1200)
+
     except SystemExit:
         print("This was a stop!")
     drb.stop()
