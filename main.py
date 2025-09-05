@@ -44,17 +44,34 @@ def menu(starting_number=1):
 
 
 def lmkmove(distance,speed):
+def lmkmove(distance, speed):
     lmk.reset_angle(0)
-    while abs(lmk.angle())<distance:
+    while abs(lmk.angle()) < distance:
+        if Button.BLUETOOTH in hub.buttons.pressed():
+            lmk.brake()
+            raise SystemExit("ENDE")
+        if Button.CENTER in hub.buttons.pressed():
+            lmk.brake()
+            wait(1)
+            raise SystemExit("ENDE GELÄNDE!")
         lmk.run(speed)
     lmk.brake()
 
 
 def rmkmove(distance,speed):
+def rmkmove(distance, speed):
     rmk.reset_angle(0)
-    while abs(rmk.angle())<distance:
+    while abs(rmk.angle()) < distance:
+        if Button.BLUETOOTH in hub.buttons.pressed():
+            rmk.brake()
+            raise SystemExit("ENDE")
+        if Button.CENTER in hub.buttons.pressed():
+            rmk.brake()
+            wait(1)
+            raise SystemExit("ENDE GELÄNDE!")
         rmk.run(speed)
     rmk.brake()
+
     
 
 
@@ -68,12 +85,10 @@ def drb_m(distance,speed,acceleration=900,second_function = None ,dist2=0,speed2
     if second_function:
         second_function(dist2,speed2)
     while not drb.done():
-        if Button.RIGHT in hub.buttons.pressed():
+        if Button.BLUETOOTH in hub.buttons.pressed():
             raise SystemExit("ENDE")
         if Button.CENTER in hub.buttons.pressed():
             wait(1)
-            '''global var
-            var=var-1'''
             raise SystemExit("ENDE GELÄNDE!")
             
 
@@ -86,12 +101,10 @@ def drb_t(angle,speed,acceleration=500,second_function = None,dist2=0,speed2=0):
     if second_function:
         second_function(dist2,speed2)
     while not drb.done():
-        if Button.RIGHT in hub.buttons.pressed():
+        if Button.BLUETOOTH in hub.buttons.pressed():
             raise SystemExit("ENDE")
         if Button.CENTER in hub.buttons.pressed():
             wait(1)
-            '''global var
-            var=var-1'''
             raise SystemExit("ENDE GELÄNDE!")
 
 
