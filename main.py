@@ -161,16 +161,17 @@ def run2():
     var = int(hub_menu("3","4","5","6","7","8","9","1","2"))
 
 def run3():
-
-    watch = StopWatch()
     try:
-        lmkmove(220,1000)
-        lmkmove(-200,1200)
-
-        elapsed_time = watch.time()
-        elapsed_seconds = elapsed_time / 1000
-        print("Verbrauchte Zeit:", elapsed_seconds, "Sekunden")
-
+        drb_m(430,300)
+        lmkmove(220,-400)
+        wait(200)
+        lmkmove(220,200)
+        lmkmove(220,-400)
+        wait(200)
+        lmkmove(220,200)
+        lmkmove(220,-400)
+        lmkmove(220,200)
+        drb_m(-430,300)
     except SystemExit:
         print("This was a stop!")
     drb.stop()
@@ -184,28 +185,30 @@ def run4():
     watch = StopWatch()
     try:
         
-        drb_m(180, 300)
+        drb_m(185, 300)
         drb_t(-90, 300)
-        drb_m(800, 500)
+        drb_m(720, 500)
         drb_t(-90, 300)
-        drb_m(160, 500)
+        drb_m(170, 500)
         drb_t(-20, 300)
-        lmkmove(850, 1000)#kran
-        
-        drb_m(-250, 400)
-        drb_k(-15, 200, 200)
-        rmkmove(350, 500)
-        drb_m(206, 400)
-        rmkmove(300, -500) #Statur
-        drb_m(-200, 400) 
-        drb_t(130, 400)
-        drb_m(150, 300)
-        drb_m(-
-        
-        
-        300, 300)
-        drb_k(60, -80, 800)
-        drb_m(550, 800)
+        lmkmove(850, 1000)#kran    
+
+        drb_m(-260, 400)
+        drb_t(-205,300)
+        rmkmove(650, -1000)
+        drb_m(120, 400)
+        rmkmove(700, 400) #Statur
+
+        drb_m(-210, 400) 
+        drb_t(140, 400)
+        drb_m(75, 300)
+        drb_t(85, 300)
+        drb_m(-180, 100) #Wage
+        drb_m(130,270)   #One way door
+        drb_t(90,300)
+        drb_m(600,400)
+        drb_t(-45, 400)
+        drb_m(500, 1000)
 
         elapsed_time = watch.time()
         elapsed_seconds = elapsed_time / 1000
@@ -224,7 +227,17 @@ def run5():
     watch = StopWatch()
     
     try:
-        drb_m(200, 300)
+        drb_m(800, 600)
+        drb_t(-42, 300)
+        drb_m(180, 200)
+        lmkmove(100, 600)
+        drb_m(-110, 500)
+        drb_t(42, 300)
+        drb_m(-160, 150)
+        lmkmove(280, 700)
+        wait(1200)
+        lmkmove(180, -600)
+        drb_m(-540, 600)
         drb.stop()
         lmk.brake()
         rmk.brake()
