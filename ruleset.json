@@ -1,0 +1,42 @@
+{
+  "name": "Protect main branch",
+  "target": "branch",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "include": ["refs/heads/main"],
+      "exclude": []
+    }
+  },
+  "rules": [
+    {
+      "type": "pull_request",
+      "parameters": {
+        "required_approvals": 1,
+        "dismiss_stale_reviews_on_push": true,
+        "require_code_owner_review": false,
+        "required_conversation_resolution": true
+      }
+    },
+    {
+      "type": "linear_history",
+      "parameters": {
+        "require_linear_history": true
+      }
+    },
+    {
+      "type": "force_push",
+      "parameters": {
+        "enabled": false
+      }
+    },
+    {
+      "type": "allowed_merge_methods",
+      "parameters": {
+        "merge": false,
+        "squash": true,
+        "rebase": true
+      }
+    }
+  ]
+}
