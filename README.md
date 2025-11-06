@@ -1,81 +1,47 @@
 
 # Unearthed
 
-Eine kleine Python-Codebasis mit Hilfs-Skripten und Tests.
-
-Dieses Repository enthält mehrere Skripte wie `run.py`, `blocks.py`, `schieben.py` und eine einfache Testdatei `tests.py`.
+Das Proramm für unser Roboter für die Unearthed season. Programiert in Python mit PyBricks.
 
 ## Inhalt
 
-- `run.py` – Hauptskript zum Ausführen (siehe Beschreibung im Code).
-- `blocks.py` – Hilfsfunktionen / Module für Block-Operationen.
-- `schieben.py` – Zusatzskript (bewegt/verschiebt Dinge — siehe Code).
-- `tests.py` – Einfache Tests / Test-Sammlung.
-
-> Hinweis: Lies die Kommentare in den einzelnen Dateien für Details zur Benutzung und zu Abhängigkeiten.
-
-## Voraussetzungen
-
-- Python 3.8+ (empfohlen)
-- Git (zum Klonen des Repositories)
-
-Optional:
-- `pytest` zum Ausführen der Tests (`pip install pytest`).
+- `run.py` – Hauptskript zum Ausführen.
+- `blocks.py` – Blöcke für main.
+- `schieben.py` – Programm womit man den Roboter auf den Spielfeld schieben kann um den Code zu bekommen.
+- `tests.py` – Dokument für temporäre tests. (Wird in der Git repository nicht gespeichert)
 
 ## Repository klonen
 
-Öffne ein Terminal (z. B. PowerShell) und führe aus:
+### Schritt 1: Erstelle dir einen GitHub Konto
 
-```powershell
-git clone https://github.com/FFLish/Unearthed.git
-cd Unearthed
-```
+### Schritt 2: Git installieren
+- Lade dir hier den Installer herunter und führe ihn aus: https://git-scm.com/downloads
+- Alternativ Installation über die Kommandozeile
 
-Wenn du das Repository in VS Code klonen willst, öffne die Quellverwaltung (Source Control) in VS Code und nutze die Schaltfläche "Repository klonen". Du kannst auch das gleiche `git clone` in der integrierten Konsole ausführen.
+### Schritt 3: VSCode installieren
+- Googlen hilft :-)
 
-Wichtig: Falls das Repository privat ist, stelle sicher, dass du bei GitHub angemeldet bist und ggf. SSH- oder HTTPS-Zugang konfiguriert hast.
+### Schritt 4: Einrichten von VSCode
+- Öffne VSCode
+- Links auf der Taskleiste findest `Source Control` drücke drauf
+- Wähle `Clone Git Repository` aus
+- Füge den Link aus diesem Browserfenster ein
+- Gib ggf. deine Anmeldedaten für Git ein bzw. gewähre VSCode Zugriff auf dein Konto
+- Wähle einen Ordner aus, in dem das Repository lokal gespeichert werden soll
+
+## Branches
+Zu viele Köche verderben den Brei ;-) Zumindest, wenn alle gleichzeitig an unterschiedlichen Dingen arbeiten. Dafür gibt es in Git das Konzept der "Branches". Ein Branch geht immer vom "Stamm", dem main-Branch, aus. Auf dem Branch kann ein Entwickler Änderungen vornehmen, Features ergänzen etc. Sobald der Branch fertig ist, wird ein "Pull Request" erstellt, eine Anfrage an den Administrator, die Änderungen in den main-Branch zu übernehmen. Dazu, wie Branches und Pull Requests funktionieren, gibt es ganz viel Material im Internet, daher gehen wir hier nicht näher darauf ein.
+
+In unserem Repository gibt es insbesondere 3 wichtige Branches: "main" ist der hauptprogramm den fertigen Programm deployed. In "optimize" werden die runs verbessert erstellt. "develop" dient der Weiterentwicklung 
 
 ## Projekt starten
+Wenn du Änderungen gemacht hast kannst du in Terminal oben mit "New Terminal" dieses Comand eingeben: `py -3 -m pipx run pybricksdev run ble test.py` und auf den Roboter starten (Roboter muss Bluethout anhaben)
 
-Die genaue Nutzung hängt vom jeweiligen Skript ab. Ein allgemeiner Startbefehl ist:
-
-```powershell
-python run.py
-```
-
-Wenn dein System mehrere Python-Versionen hat, benutze ggf. `py -3 run.py` oder `python3 run.py`.
-
-## Tests
-
-Falls `tests.py` eine ausführbare Testdatei ist, kannst du sie direkt starten:
-
-```powershell
-python tests.py
-```
-
-Alternativ, falls du `pytest` verwendest:
-
-```powershell
-pytest -q
-```
 
 ## Beiträge
 
 Wenn du beitragen möchtest:
-
-1. Forke das Repository.
-2. Erstelle einen neuen Branch: `git checkout -b feature/mein-feature`.
-3. Committe deine Änderungen und pushe sie: `git push origin feature/mein-feature`.
+1. Gehe wieder auf Source control
+2. Erstelle einen neuen Branch.
+2. Committe deine Änderungen und pushe sie.
 4. Erstelle einen Pull Request auf GitHub.
-
-## Kontakt
-
-Bei Fragen oder Problemen öffne bitte ein Issue im Repository oder kontaktiere den Maintainer über das GitHub-Profil `FFLish`.
-
-## Lizenz
-
-Standardmäßig keine Lizenz angegeben. Falls du eine Lizenz hinzufügen möchtest, lege eine `LICENSE`-Datei an (z. B. MIT, Apache-2.0).
-
----
-
-Wenn du möchtest, kann ich die README weiter anpassen (z. B. konkrete Beispiele für `run.py`, Anforderungen in `requirements.txt` erstellen oder Tests mit `pytest` einrichten). Sag mir einfach, welche Details du ergänzt haben willst.
