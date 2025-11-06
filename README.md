@@ -95,7 +95,7 @@ Lade **Visual Studio Code (VS Code)** von der offiziellen Website herunter und i
 ## Projekt starten
 
 Wenn du Änderungen gemacht hast, kannst du das Programm über das Terminal starten.  
-Öffne in VS Code oben das Menü **Terminal → New Terminal** und gib folgenden Befehl ein: `py -3 -m pipx run pybricksdev run ble test.py`
+Öffne in VS Code oben das Menü **Terminal → New Terminal** und gib folgenden Befehl ein: `py -3 -m pipx run pybricksdev run ble main.py`
 
 Der Roboter muss dafür **Bluetooth aktiviert** haben.
 
