@@ -12,6 +12,7 @@ distance_count = 0
 angle_count = 0
 current_measurement = None  # None, 'distance' oder 'angle'
 
+
 # Radparameter
 wheel_diameter = 62  # mm
 PI = 3.14159
