@@ -1,0 +1,10 @@
+tests.py
+
+__pycache__/
+*.py[cod]
+.Python
+env/
+venv/
+
+*.hex
+*.uf2

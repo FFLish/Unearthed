@@ -1,1 +1,0 @@
-Dokument für temporäre Tests.
