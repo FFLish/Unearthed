@@ -1,15 +1,5 @@
 from pybricks.tools import wait, StopWatch, hub_menu
-from blocks import (
-    hub,
-    drb,
-    lmk,
-    rmk,
-    drb_m,
-    drb_t,
-    drb_k,
-    lmkmove,
-    rmkmove
-)
+from blocks import (hub,drb,lmk,rmk,drb_m,drb_t,drb_k,lmkmove,rmkmove)
 
 def run1(): 
     watch = StopWatch()
@@ -112,6 +102,21 @@ def run3():
 def run4():
     watch = StopWatch()
     try:
+        drb_k(230, -90, 400)
+        drb_m(440, 400)
+        drb_t(-90, 300)
+        drb_m(230, 300)
+        drb_t(-10,200)
+        lmkmove(1200,900)
+        drb_t(10,200)
+        drb_m(10,300)
+        drb_m(-100,300)
+        drb_t(133, 300)
+        rmkmove(560, 900)
+        drb_m(320, 400)
+        rmkmove(480, -500)
+        drb_k(-100, 60, -300)
+        drb_m(780, 600)
 
         drb_m(5, 500)
         drb_t(-45, 400)
