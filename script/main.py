@@ -112,32 +112,9 @@ def run3():
 def run4():
     watch = StopWatch()
     try:
-        drb_m(870, 500)
-        drb_t(-90, 300)
-        drb_m(170, 500)
-        drb_t(-20, 300)
-        lmkmove(850, 1000)    
 
-        drb_m(-260, 400)
-        drb_t(-210,300)
-        rmkmove(650, -1000)
-        drb_m(120, 400)
-        rmkmove(260, 400) 
-        drb_t(20, 400)
-
-        drb_m(-150, 400) 
-        rmkmove(450, 400)
-        drb_t(140, 400)
-        drb_m(150, 300)
-        drb_t(90, 300)
-        drb_m(-190, 100)
-        drb_m(140,270)
-        
-        drb_t(90,300)
-        drb_m(300,400)
-        drb_t(-15, 400)
-        drb_m(700, 1000)
-
+        drb_m(5, 500)
+        drb_t(-45, 400)
         elapsed_time = watch.time()
         elapsed_seconds = elapsed_time / 1000
         print("Verbrauchte Zeit:", elapsed_seconds, "Sekunden")
@@ -232,6 +209,7 @@ def run8():
     watch = StopWatch()
     try:
         drb_m(540, 1000)
+        wait(500)
         drb_m(-270, 1000)
 
 
@@ -339,3 +317,31 @@ while True:
         print("run9")
         run9()
     wait(100)
+
+
+ '''     drb_m(-260, 400)
+        drb_t(-210,300)
+        rmkmove(650, -1000)
+        drb_m(120, 400)
+        rmkmove(260, 400) 
+        drb_t(20, 400)
+
+        drb_m(-150, 400) 
+        rmkmove(450, 400)
+        drb_t(140, 400)
+        drb_m(150, 300)
+        drb_t(90, 300)
+        drb_m(-190, 100)
+        drb_m(140,270)
+        
+        drb_t(90,300)
+        drb_m(300,400)
+        drb_t(-15, 400)
+        drb_m(700, 1000)       
+        drb_m(870, 500)
+        drb_t(-90, 300)
+        drb_m(170, 500)
+        drb_t(-20, 300)
+        lmkmove(850, 1000)    
+
+'''       
