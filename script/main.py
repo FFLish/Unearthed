@@ -4,7 +4,12 @@ from blocks import (hub,drb,lmk,rmk,drb_m,drb_t,drb_k,lmkmove,rmkmove)
 def run1(): 
     watch = StopWatch()
     try:
-        drb_m(705, 350)
+        drb_k(200,-45,500)
+        drb_m(300,500)
+        drb_k(300,-90,500)
+        drb_k(300,90,500)
+        drb_m(100,500)
+        '''drb_m(705, 350)
         drb_t(-45, 300)
         drb_m(100, 300)
         drb_t(-45, 300)
@@ -27,7 +32,7 @@ def run1():
         drb_t(70,300)
         drb_m(200,300)
         drb_t(30,300)
-        drb_m(500,400)
+        drb_m(500,400)'''
 
         elapsed_time = watch.time()
         elapsed_seconds = elapsed_time / 1000
