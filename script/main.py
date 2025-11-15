@@ -79,7 +79,7 @@ def run2():
     var = int(hub_menu("3","4","5","6","7","8","9","1","2"))
 
 def run3():
-    try:
+    try: 
         drb_m(430,300)
         lmkmove(220,-800)
         wait(200)
@@ -324,7 +324,7 @@ while True:
     wait(100)
 
 
- '''     drb_m(-260, 400)
+'''     drb_m(-260, 400)
         drb_t(-210,300)
         rmkmove(650, -1000)
         drb_m(120, 400)
