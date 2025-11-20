@@ -9,13 +9,14 @@ from pybricks.hubs import PrimeHub
 hub = PrimeHub()
 
 hub.system.set_stop_button({Button.BLUETOOTH})
-lmA = Motor(Port.C, positive_direction=Direction.COUNTERCLOCKWISE)
-rmB = Motor(Port.D)
+lmg = Motor(Port.C, positive_direction=Direction.COUNTERCLOCKWISE)
+rmg = Motor(Port.D)
 lmk = Motor(Port.F)
 rmk = Motor(Port.B)
 radius = 31.2
-drb = DriveBase(lmA, rmB, 62.4, 158)
+drb = DriveBase(lmg, rmg, 62.4, 158)
 drb.use_gyro(True)
+
 
 def lmkmove(distance, speed):
     lmk.reset_angle(0)
