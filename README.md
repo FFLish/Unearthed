@@ -56,15 +56,14 @@ Jeder Commit bekommt eine eindeutige **ID (Hash)** – eine lange Zahlen- und Bu
 1. Du erstellst ein neues Projekt auf GitHub.  
 2. Du legst einen Branch mit dem Namen `neues-feature` an.  
 3. Du änderst Dateien und machst Commits.  
-4. Wenn du fertig bist, erstellst du einen **Pull Request** – also eine Anfrage, deine Änderungen in den main-Branch zu übernehmen.  
-5. Jemand überprüft die Änderungen, und dann wird **gemerged** (zusammengeführt).  
+4. Wenn du fertig bist, erstellst du einen **Pull**
+5. Dann kannst du auf GitHub mergen
 
 ---
 
 ## Inhalt des Repositories
 
-- `run.py` – Hauptskript zum Ausführen des Programms.  
-- `blocks.py` – Modul mit Codeblöcken, die im Hauptprogramm verwendet werden.  
+- `main.py` – Hauptskript zum Ausführen des Programms.  
 - `schieben.py` – Programm, mit dem man den Roboter über das Spielfeld bewegen kann, um Positionen oder Abläufe zu testen.  
 - `tests.py` – Dokument für temporäre Tests (wird nicht dauerhaft im Git-Repository gespeichert).
 
@@ -94,10 +93,7 @@ Lade **Visual Studio Code (VS Code)** von der offiziellen Website herunter und i
 
 ## Projekt starten
 
-Wenn du Änderungen gemacht hast, kannst du das Programm über das Terminal starten.  
-Öffne in VS Code oben das Menü **Terminal → New Terminal** und gib folgenden Befehl ein: `py -3 -m pipx run pybricksdev run ble main.py`
-
-Der Roboter muss dafür **Bluetooth aktiviert** haben.
+Drücke F5 auf deinen PC.
 
 ---
 
