@@ -98,18 +98,16 @@ def run1():
         drb_k(100,-60,200)
         drb_m(400,500)
         drb_k(300,-62,900)
-        drb_m(20,1000)
-        drb_k(87,85,500)
+        drb_k(87,83,500)
         rmkmove(800,900)
         lmkmove(200, 800)
         drb_m(-65,500)
         rmkmove(800,-900)
         drb_m(-25, 1000)
         drb_k(-40,-62,900)
-        drb_k(270,110,500)
-        
-        drb_m(480,900)
-        drb_k(90,-85,500)
+        drb_k(270,120,500)
+        drb_m(435,900)
+        drb_k(90,-95,500)
 
 
         elapsed_time = watch.time()
