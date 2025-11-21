@@ -10,6 +10,12 @@ from pybricks.hubs import PrimeHub
 hub = PrimeHub()
 
 hub.system.set_stop_button({Button.BLUETOOTH})
+class StopRun(Exception):
+    def __init__(self, message: str = "", stop_program: bool = False):
+        super().__init__(message)
+        self.message = message
+        self.stop_program = stop_program
+
 lmg = Motor(Port.C, positive_direction=Direction.COUNTERCLOCKWISE)
 rmg = Motor(Port.D)
 lmk = Motor(Port.F)
@@ -23,11 +29,11 @@ def lmkmove(distance, speed):
     while abs(lmk.angle()) < distance:
         if Button.BLUETOOTH in hub.buttons.pressed():
             lmk.brake()
-            raise SystemExit("ENDE")
+            raise StopRun("ENDE")
         if Button.CENTER in hub.buttons.pressed():
             lmk.brake()
             wait(1000)
-            raise SystemExit("ENDE GELÄNDE!")
+            raise StopRun("ENDE GELÄNDE!")
         lmk.run(speed)
     lmk.brake()
 
@@ -36,43 +42,41 @@ def rmkmove(distance, speed):
     while abs(rmk.angle()) < distance:
         if Button.BLUETOOTH in hub.buttons.pressed():
             rmk.brake()
-            raise SystemExit("ENDE")
+            raise StopRun("ENDE")
         if Button.CENTER in hub.buttons.pressed():
             rmk.brake()
             wait(1000)
-            raise SystemExit("ENDE GELÄNDE!")
+            raise StopRun("ENDE GELÄNDE!")
         rmk.run(speed)
     rmk.brake()
 
-def drb_m(distance, speed, acceleration=900, second_function=None, dist2=0, speed2=0):
+def drb_m(distance,speed,acceleration=900,second_function = None,dist2=0,speed2=0):
     print("start function")
-    drb.settings(speed, acceleration, 90, 500)
+    drb.settings(speed,acceleration,90, 500)
     print("finish settings")
-    drb.straight(distance, Stop.HOLD, False)
+    drb.straight(distance,Stop.HOLD,False)
     print("move done")
     if second_function:
-        second_function(dist2, speed2)
+        second_function(dist2,speed2)
     while not drb.done():
-        if Button.BLUETOOTH in hub.buttons.pressed():
-            raise SystemExit("ENDE")
+        if Button.RIGHT in hub.buttons.pressed():
+            raise StopRun("ENDE")
         if Button.CENTER in hub.buttons.pressed():
-            wait(1000)
-            raise SystemExit("ENDE GELÄNDE!")
-        wait(10)
+            wait(1)
+            raise StopRun("ENDE GELÄNDE!")
 
-def drb_t(angle, speed, acceleration=500, second_function=None, dist2=0, speed2=0):
+def drb_t(angle,speed,acceleration=500,second_function = None,dist2=0,speed2=0):
     print(hub.imu.heading())
-    drb.settings(400, 400, speed, acceleration)
-    drb.turn(angle, Stop.HOLD, False)
+    drb.settings(400,400,speed,acceleration)
+    drb.turn(angle,Stop.HOLD,False)
     if second_function:
-        second_function(dist2, speed2)
+        second_function(dist2,speed2)
     while not drb.done():
-        if Button.BLUETOOTH in hub.buttons.pressed():
-            raise SystemExit("ENDE")
+        if Button.RIGHT in hub.buttons.pressed():
+            raise StopRun("ENDE")
         if Button.CENTER in hub.buttons.pressed():
-            wait(1000)
-            raise SystemExit("ENDE GELÄNDE!")
-        wait(10)
+            wait(1)
+            raise StopRun("ENDE GELÄNDE!")
 
 def drb_k(radius, angle, speed, acceleration=500, second_function=None, dist2=0, speed2=0):
     print(f"Starting heading: {hub.imu.heading()}")
@@ -87,12 +91,14 @@ def drb_k(radius, angle, speed, acceleration=500, second_function=None, dist2=0,
     
     while not drb.done():
         if Button.BLUETOOTH in hub.buttons.pressed():
-            raise SystemExit("ENDE")
+            raise StopRun("ENDE")
         if Button.CENTER in hub.buttons.pressed():
             wait(1000)
-            raise SystemExit("ENDE GELÄNDE!")
+            raise StopRun("ENDE GELÄNDE!")
+        
         wait(10)
 def run1(): 
+    watch = StopWatch()
     try:
         drb_m(100,600)
         drb_k(100,-60,200)
@@ -114,8 +120,18 @@ def run1():
         elapsed_seconds = elapsed_time / 1000
         print("Verbrauchte Zeit:", elapsed_seconds, "Sekunden")
 
-    except SystemExit:
-        print("This was a stop!")
+    except StopRun as e:
+        if getattr(e, 'message', ''):
+            print("This was a stop!", e.message)
+        else:
+            print("This was a stop!")
+        if 'watch' in locals():
+            try:
+                elapsed_time = watch.time()
+                elapsed_seconds = elapsed_time / 1000
+                print("Verbrauchte Zeit:", elapsed_seconds, "Sekunden")
+            except Exception:
+                pass
     drb.stop()
     lmk.brake()
     rmk.brake()
@@ -123,6 +139,7 @@ def run1():
     var = int(hub_menu("2","3","4","5","6","7","8","1"))
 
 def run2():
+    watch = StopWatch()
     try:
         print("hallo")
         drb_m(770, 400)
@@ -142,8 +159,18 @@ def run2():
         elapsed_seconds = elapsed_time / 1000
         print("Verbrauchte Zeit:", elapsed_seconds, "Sekunden")
 
-    except SystemExit:
-        print("This was a stop!")
+    except StopRun as e:
+        if getattr(e, 'message', ''):
+            print("This was a stop!", e.message)
+        else:
+            print("This was a stop!")
+        if 'watch' in locals():
+            try:
+                elapsed_time = watch.time()
+                elapsed_seconds = elapsed_time / 1000
+                print("Verbrauchte Zeit:", elapsed_seconds, "Sekunden")
+            except Exception:
+                pass
     drb.stop()
     lmk.brake()
     rmk.brake()
@@ -155,8 +182,11 @@ def run3():
         drb_m(590,400)
         rmkmove(1000,500)
         drb_m(-590,400)
-    except SystemExit:
-        print("This was a stop!")
+    except StopRun as e:
+        if getattr(e, 'message', ''):
+            print("This was a stop!", e.message)
+        else:
+            print("This was a stop!")
     drb.stop()
     lmk.brake()
     rmk.brake()
@@ -165,25 +195,37 @@ def run3():
 
 
 def run4():
+    watch = StopWatch()
     try:
         drb_m(50,500)
         drb_t(-65,500)
         drb_k(550,20,500)
         drb_m(330,500)
-        rmkmove(330,500)
-        drb_m(-150, 500)
+        rmkmove(380,500)
+        drb_m(-170, 500)
         drb_k(700,-5,500)
-        rmkmove(330,-500)
-        drb_k(400,5,500)
-        lmkmove(350, -500)
-        drb_k(-400,20,500)
-        drb_m(-450,500)
+        rmkmove(360,-500)
+        drb_k(200,7.5,500)
+        lmkmove(380, -500)
+        drb_k(-400,20,600)
+        drb_m(-450,900)
         elapsed_time = watch.time()
         elapsed_seconds = elapsed_time / 1000
         print("Verbrauchte Zeit:", elapsed_seconds, "Sekunden")
+        
 
-    except SystemExit:
-        print("This was a stop!")
+    except StopRun as e:
+        if getattr(e, 'message', ''):
+            print("This was a stop!", e.message)
+        else:
+            print("This was a stop!")
+        if 'watch' in locals():
+            try:
+                elapsed_time = watch.time()
+                elapsed_seconds = elapsed_time / 1000
+                print("Verbrauchte Zeit:", elapsed_seconds, "Sekunden")
+            except Exception:
+                pass
     drb.stop()
     lmk.brake()
     rmk.brake()
@@ -217,8 +259,11 @@ def run5():
         elapsed_seconds = elapsed_time / 1000
         print("Verbrauchte Zeit:", elapsed_seconds, "Sekunden")
 
-    except SystemExit:
-        print("This was a stop!")
+    except StopRun as e:
+        if getattr(e, 'message', ''):
+            print("This was a stop!", e.message)
+        else:
+            print("This was a stop!")
     drb.stop()
     lmk.brake()
     rmk.brake()
@@ -245,8 +290,11 @@ def run6():
         elapsed_seconds = elapsed_time / 1000
         print("Verbrauchte Zeit:", elapsed_seconds, "Sekunden")
 
-    except SystemExit:
-        print("This was a stop!")
+    except StopRun as e:
+        if getattr(e, 'message', ''):
+            print("This was a stop!", e.message)
+        else:
+            print("This was a stop!")
     drb.stop()
     lmk.brake()
     rmk.brake()
@@ -282,14 +330,18 @@ def run7():
         drb.stop()
         lmk.brake()
         rmk.brake()
-    except SystemExit:
-        print("This was a stop!")
+    except StopRun as e:
+        if getattr(e, 'message', ''):
+            print("This was a stop!", e.message)
+        else:
+            print("This was a stop!")
     drb.stop()
     global var
     var = int(hub_menu("8","1","2","3","4","5","6","7"))
 
 
 def run8():
+    watch = StopWatch()
     try:
 
         drb_m(500, 900)
@@ -300,8 +352,18 @@ def run8():
         drb.stop()
         lmk.brake()
         rmk.brake()
-    except SystemExit:
-        print("This was a stop!")
+    except StopRun as e:
+        if getattr(e, 'message', ''):
+            print("This was a stop!", e.message)
+        else:
+            print("This was a stop!")
+        if 'watch' in locals():
+            try:
+                elapsed_time = watch.time()
+                elapsed_seconds = elapsed_time / 1000
+                print("Verbrauchte Zeit:", elapsed_seconds, "Sekunden")
+            except Exception:
+                pass
     drb.stop()
     global var
     var = int(hub_menu("1","2","3","4","5","6","7","8"))
@@ -312,29 +374,47 @@ except Exception:
     var = 1
 
 while True:
-    if var == 1:
-        print("run1")
-        run1() 
-    elif var == 2:
-        print("run2")
-        run2()
-    elif var == 3:
-        print("run3")
-        run3()
-    elif var == 4:
-        print("run4")
-        run4()
-    elif var == 5:
-        print("run5")
-        run5()
-    elif var == 6:
-        print("run6")
-        run6()
-    elif var == 7:
-        print("run7")
-        run7()
-    elif var == 8:
-        print("run8")
-        run8()
+    try:
+        if var == 1:
+            print("run1")
+            run1()
+        elif var == 2:
+            print("run2")
+            run2()
+        elif var == 3:
+            print("run3")
+            run3()
+        elif var == 4:
+            print("run4")
+            run4()
+        elif var == 5:
+            print("run5")
+            run5()
+        elif var == 6:
+            print("run6")
+            run6()
+        elif var == 7:
+            print("run7")
+            run7()
+        elif var == 8:
+            print("run8")
+            run8()
+    except StopRun as e:
+        # If a caller explicitly requested stopping the whole program, exit.
+        if getattr(e, 'stop_program', False):
+            if getattr(e, 'message', ''):
+                print("Stopping program:", e.message)
+            else:
+                print("Stopping program")
+            break
+
+        # Otherwise, only stop the current run and return to the menu.
+        if getattr(e, 'message', ''):
+            print("Run stopped:", e.message)
+        else:
+            print("Run stopped")
+        drb.stop()
+        lmk.brake()
+        rmk.brake()
     wait(100)
     
