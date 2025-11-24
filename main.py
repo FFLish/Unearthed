@@ -197,18 +197,17 @@ def run3():
 def run4():
     watch = StopWatch()
     try:
-        drb_m(50,500)
-        drb_t(-65,500)
-        drb_k(550,20,500)
-        drb_m(330,500)
-        rmkmove(380,500)
-        drb_m(-170, 500)
-        drb_k(700,-5,500)
+        drb_m(80,500)
+        drb_t(-70,500)
+        drb_k(650,27,500)
+        drb_m(210,500)
+        rmkmove(450,500)
+        drb_m(-180, 500)
+        drb_k(500,-6,500)
         rmkmove(360,-500)
-        drb_k(200,7.5,500)
         lmkmove(380, -500)
         drb_k(-400,20,600)
-        drb_m(-450,900)
+        drb_k(-1800,13,600)
         elapsed_time = watch.time()
         elapsed_seconds = elapsed_time / 1000
         print("Verbrauchte Zeit:", elapsed_seconds, "Sekunden")
@@ -235,25 +234,34 @@ def run4():
 def run5():
     watch = StopWatch()
     try:
-        drb_k(230, -90, 400)
-        drb_m(440, 400)
-        drb_t(-90, 300)
+        
+        drb_m(220, 800)
+        drb_t(-90, 500)
+        drb_m(650, 600)
+        drb_t(-90, 400)
         drb_m(230, 300)
         drb_t(-10,200)
-        lmkmove(1200,900)
+        lmkmove(1100,900)
         drb_t(10,200)
-        drb_m(10,300)
+        drb_m(20,300)
         drb_m(-100,300)
         drb_t(133, 300)
-        rmkmove(560, 900)
+        rmkmove(620, 900)
         drb_m(320, 400)
-        rmkmove(210, -600)
-        drb_t(22, 300)
-        drb_k(-100, 82, -300)
-        drb_m(780, 600)
+        rmkmove(90, -400)
+        drb_t(20, 300)
+        rmkmove(290, -400)
+        drb_k(-120, 75, -300)
+        drb_m(800, 600)
+        #zurückfaheren
+        drb_m(-700, 900)
+        drb_t(30, 600)
+        drb_m(-850, 900)  
+        drb_t(77, 600)
+        drb_m(-240, 900)
+        rmkmove(350, -900)
 
-        drb_m(5, 500)
-        
+             
 
         elapsed_time = watch.time()
         elapsed_seconds = elapsed_time / 1000
@@ -275,13 +283,14 @@ def run6():
     try:
         drb_m(750, 500)
         drb_t(30, 500)
-        drb_m(160, 400)
-        drb_k(70, 60, 500)
-        drb_m(150, 500)
-        lmkmove(40,-400)
+        drb_m(170, 400)
+        drb_k(90, 60, 500)
+        drb_m(130, 500)
+        lmkmove(33,-400)
         rmkmove(200,500)
-        rmkmove(190,-500)
-        drb_m(-170,500)
+        rmkmove(190,-900)
+        drb_m(-170,300)
+        lmkmove(7,-900)
         drb_t(100,500)
         drb_m(800,1000)  
 
@@ -315,18 +324,15 @@ def run7():
         rmkmove(100, 700)#Landkarte hoch
         drb_m(-35, 150)
         wait(500)
-        lmkmove(290, 800)#dreizack runter
-        lmkmove(190, -900)
-        drb_m(-600, 1000)
+        lmkmove(400, 800)#dreizack runter
+        lmkmove(250, -900)
+        rmkmove(100, 900)       
+        drb_m(-630, 1000)
         drb.stop()
         lmk.brake()
         rmk.brake()
 
 
-
-        drb_m(500, 900)
-        rmkmove(120, 800)
-        drb_m(-500, 900)
         drb.stop()
         lmk.brake()
         rmk.brake()
@@ -344,8 +350,9 @@ def run8():
     watch = StopWatch()
     try:
 
-        drb_m(500, 900)
+        drb_m(470, 900)
         rmkmove(120, 800)
+        drb_m(30, 900)
         drb_m(-500, 900)
         drb.stop()
        
