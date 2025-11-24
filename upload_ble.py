@@ -21,22 +21,23 @@ if hub_name:
 cmd.append(program)
 
 print("Running:", " ".join(cmd))
-try:
-    completed = subprocess.run(cmd, check=True, capture_output=True, text=True)
-    if completed.stdout:
-        print("--- stdout ---")
-        print(completed.stdout)
-    if completed.stderr:
-        print("--- stderr ---")
-        print(completed.stderr)
-except subprocess.CalledProcessError as e:
-    print(f"Command failed with exit code {e.returncode}.")
-    if e.stdout:
-        print("--- stdout ---")
-        print(e.stdout)
-    if e.stderr:
-        print("--- stderr ---")
-        print(e.stderr)
-    print("\nYou can also run the failing command manually in PowerShell to see full output:")
-    print("    python -m pybricksdev run ble", os.path.basename(program))
-    raise
+
+# Diagnostic info
+print("Python executable:", sys.executable)
+print("PATH:", os.environ.get("PATH", "(none)"))
+
+# Run without raising so we can show stdout/stderr and return code
+completed = subprocess.run(cmd, check=False, capture_output=True, text=True)
+print(f"Command exited with return code: {completed.returncode}")
+if completed.stdout:
+    print("--- stdout ---")
+    print(completed.stdout)
+if completed.stderr:
+    print("--- stderr ---")
+    print(completed.stderr)
+
+if completed.returncode != 0:
+    print("\nCommand failed. You can reproduce manually in PowerShell to see full interactive output:")
+    print(f"    python -m pybricksdev run ble {os.path.basename(program)}")
+    # Exit with the same return code so callers can detect failure
+    sys.exit(completed.returncode)
