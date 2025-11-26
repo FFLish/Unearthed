@@ -38,6 +38,7 @@ if completed.stderr:
 
 if completed.returncode != 0:
     print("\nCommand failed. You can reproduce manually in PowerShell to see full interactive output:")
-    print(f"    python -m pybricksdev run ble {os.path.basename(program)}")
-    # Exit with the same return code so callers can detect failure
-    sys.exit(completed.returncode)
+    print(f"    python -m pybricksdev run ble \"{program}\"")
+    # Exit with the same return code. Use os._exit to avoid a SystemExit traceback
+    # when this script is executed inside interactive/debug consoles.
+    os._exit(completed.returncode)

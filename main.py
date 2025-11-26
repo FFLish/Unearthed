@@ -136,7 +136,7 @@ def run1():
     lmk.brake()
     rmk.brake()
     global var
-    var = int(hub_menu("2","3","4","5","6","7","8","9","10","1"))
+    var = int(hub_menu("2","3","4","5","6","7","8","9","0","1"))
 
 def run2():
     watch = StopWatch()
@@ -175,7 +175,7 @@ def run2():
     lmk.brake()
     rmk.brake()
     global var
-    var = int(hub_menu("3","4","5","6","7","8","9","10","1","2"))
+    var = int(hub_menu("3","4","5","6","7","8","9","0","1","2"))
 
 def run3():
     try:
@@ -191,7 +191,7 @@ def run3():
     lmk.brake()
     rmk.brake()
     global var
-    var = int(hub_menu("4","5","6","7","8","9","10","1","2","3"))
+    var = int(hub_menu("4","5","6","7","8","9","0","1","2","3"))
 
 
 def run4():
@@ -212,7 +212,6 @@ def run4():
         elapsed_seconds = elapsed_time / 1000
         print("Verbrauchte Zeit:", elapsed_seconds, "Sekunden")
         
-        
 
     except StopRun as e:
         if getattr(e, 'message', ''):
@@ -230,11 +229,12 @@ def run4():
     lmk.brake()
     rmk.brake()
     global var
-    var = int(hub_menu("5","6","7","8","9","10","1","2","3","4"))
+    var = int(hub_menu("5","6","7","8","9","0","1","2","3","4"))
 
 def run5():
     watch = StopWatch()
     try:
+        
         drb_m(220, 800)
         drb_t(-90, 500)
         drb_m(650, 600)
@@ -261,7 +261,7 @@ def run5():
         drb_m(-240, 900)
         rmkmove(350, -900)
 
-        
+             
 
         elapsed_time = watch.time()
         elapsed_seconds = elapsed_time / 1000
@@ -276,7 +276,7 @@ def run5():
     lmk.brake()
     rmk.brake()
     global var
-    var = int(hub_menu("6","7","8","9","10","1","2","3","4","5"))
+    var = int(hub_menu("6","7","8","9","0","1","2","3","4","5"))
 
 def run6():
     watch = StopWatch()
@@ -292,7 +292,7 @@ def run6():
         drb_m(-170,300)
         lmkmove(7,-900)
         drb_t(100,500)
-        drb_m(800,1000)
+        drb_m(800,1000)  
 
 
         elapsed_time = watch.time()
@@ -308,7 +308,7 @@ def run6():
     lmk.brake()
     rmk.brake()
     global var
-    var = int(hub_menu("7","8","9","10","1","2","3","4","5","6"))
+    var = int(hub_menu("7","8","9","0","1","2","3","4","5","6"))
 
 def run7():
     watch = StopWatch()
@@ -324,18 +324,15 @@ def run7():
         rmkmove(100, 700)#Landkarte hoch
         drb_m(-35, 150)
         wait(500)
-        lmkmove(290, 800)#dreizack runter
-        lmkmove(190, -900)
-        drb_m(-600, 1000)
+        lmkmove(400, 800)#dreizack runter
+        lmkmove(250, -900)
+        rmkmove(100, 900)       
+        drb_m(-630, 1000)
         drb.stop()
         lmk.brake()
         rmk.brake()
 
 
-
-        drb_m(500, 900)
-        rmkmove(120, 800)
-        drb_m(-500, 900)
         drb.stop()
         lmk.brake()
         rmk.brake()
@@ -346,23 +343,22 @@ def run7():
             print("This was a stop!")
     drb.stop()
     global var
-    var = int(hub_menu("8","9","10","1","2","3","4","5","6","7"))
+    var = int(hub_menu("8","9","0","1","2","3","4","5","6","7"))
 
 
 def run8():
     watch = StopWatch()
     try:
-        drb_m(500, 900)
+
+        drb_m(470, 900)
         rmkmove(120, 800)
+        drb_m(30, 900)
         drb_m(-500, 900)
+        drb.stop()
+       
         drb.stop()
         lmk.brake()
         rmk.brake()
-
-        elapsed_time = watch.time()
-        elapsed_seconds = elapsed_time / 1000
-        print("Verbrauchte Zeit:", elapsed_seconds, "Sekunden")
-
     except StopRun as e:
         if getattr(e, 'message', ''):
             print("This was a stop!", e.message)
@@ -376,79 +372,72 @@ def run8():
             except Exception:
                 pass
     drb.stop()
-    lmk.brake()
-    rmk.brake()
     global var
-    var = int(hub_menu("9","10","1","2","3","4","5","6","7","8"))
-    
-    def Run9():
-        watch = StopWatch()
-        try:
-            drb_m(500, 900)
-            rmkmove(120, 800)
-            drb_m(-500, 900)
-            drb.stop()
-            lmk.brake()
-            rmk.brake()
+    var = int(hub_menu("1","2","3","4","5","6","7","8","9","0"))
 
-            elapsed_time = watch.time()
-            elapsed_seconds = elapsed_time / 1000
-            print("Verbrauchte Zeit:", elapsed_seconds, "Sekunden")
-
-        except StopRun as e:
-            if getattr(e, 'message', ''):
-                print("This was a stop!", e.message)
-            else:
-                print("This was a stop!")
-            if 'watch' in locals():
-                try:
-                    elapsed_time = watch.time()
-                    elapsed_seconds = elapsed_time / 1000
-                    print("Verbrauchte Zeit:", elapsed_seconds, "Sekunden")
-                except Exception:
-                    pass
+def run9():
+    watch = StopWatch()
+    try:
+        drb_m(470, 900)
+        rmkmove(120, 800)
+        drb_m(30, 900)
+        drb_m(-500, 900)
+        drb.stop()
         drb.stop()
         lmk.brake()
         rmk.brake()
-        global var
-        var = int(hub_menu("9","10","1","2","3","4","5","6","7","8"))
-    
-    def Run10():
-        watch = StopWatch()
-        try:
-            drb_m(500, 900)
-            drb_t(90,800)
-            drb_m(500, 900)
-            drb_t(-90,800)
-            drb_m(500, 900)
-            drb_t(-90,800)
-            drb.stop()
-            lmk.brake()
-            rmk.brake()
+    except StopRun as e:
+        if getattr(e, 'message', ''):
+            print("This was a stop!", e.message)
+        else:
+            print("This was a stop!")
+        if 'watch' in locals():
+            try:
+                elapsed_time = watch.time()
+                elapsed_seconds = elapsed_time / 1000
+                print("Verbrauchte Zeit:", elapsed_seconds, "Sekunden")
+            except Exception:
+                pass
+    drb.stop()
+    global var
+    var = int(hub_menu("0","1","2","3","4","5","6","7","8","9"))
 
-            elapsed_time = watch.time()
-            elapsed_seconds = elapsed_time / 1000
-            print("Verbrauchte Zeit:", elapsed_seconds, "Sekunden")
+def run0():
+    watch = StopWatch()
+    try:
+        for _ in range(3):
+            drb_m(800, 900)
+            drb_t(90,500)
+            drb_m(800, 900)
+            drb_t(90,500)
+            drb_m(500, 900)
+            drb_t(90,500)
+            drb_m(800, 900)
+            drb_t(90,500)
+            drb_m(-300, 900)
 
-        except StopRun as e:
-            if getattr(e, 'message', ''):
-                print("This was a stop!", e.message)
-            else:
-                print("This was a stop!")
-            if 'watch' in locals():
-                try:
-                    elapsed_time = watch.time()
-                    elapsed_seconds = elapsed_time / 1000
-                    print("Verbrauchte Zeit:", elapsed_seconds, "Sekunden")
-                except Exception:
-                    pass
+        drb.stop()
         drb.stop()
         lmk.brake()
         rmk.brake()
-        global var
-        var = int(hub_menu("1","2","3","4","5","6","7","8","9","10"))
+    except StopRun as e:
+        if getattr(e, 'message', ''):
+            print("This was a stop!", e.message)
+        else:
+            print("This was a stop!")
+        if 'watch' in locals():
+            try:
+                elapsed_time = watch.time()
+                elapsed_seconds = elapsed_time / 1000
+                print("Verbrauchte Zeit:", elapsed_seconds, "Sekunden")
+            except Exception:
+                pass
+    drb.stop()
+    global var
+    var = int(hub_menu("1","2","3","4","5","6","7","8","9","0"))
+    
 try:
-    var = int(hub_menu("1","2","3","4","5","6","7","8","9","10"))
+    var = int(hub_menu("1","2","3","4","5","6","7","8","9","0"))
 except Exception:
     var = 1
 
@@ -480,11 +469,12 @@ while True:
             run8()
         elif var == 9:
             print("run9")
-            Run9()
-        elif var == 10:
-            print("run10")
-            Run10()
+            run9()
+        elif var == 0:
+            print("run0")
+            run0()
     except StopRun as e:
+        # If a caller explicitly requested stopping the whole program, exit.
         if getattr(e, 'stop_program', False):
             if getattr(e, 'message', ''):
                 print("Stopping program:", e.message)
@@ -492,6 +482,7 @@ while True:
                 print("Stopping program")
             break
 
+        # Otherwise, only stop the current run and return to the menu.
         if getattr(e, 'message', ''):
             print("Run stopped:", e.message)
         else:
