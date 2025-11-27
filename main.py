@@ -405,17 +405,16 @@ def run9():
 def run0():
     watch = StopWatch()
     try:
-        for _ in range(3):
-            drb_m(800, 900)
-            drb_t(90,500)
-            drb_m(800, 900)
-            drb_t(90,500)
-            drb_m(500, 900)
-            drb_t(90,500)
-            drb_m(800, 900)
-            drb_t(90,500)
-            drb_m(-300, 900)
-
+        drb_m(770, 900)
+        drb_t(90,700)
+        drb_m(1400, 900)
+        drb_t(90,700)
+        drb_m(510, 900)
+        drb_t(90,700)
+        drb_m(1400, 900)
+        drb_t(90,700)
+        drb_m(-270, 900)
+        
         drb.stop()
         drb.stop()
         lmk.brake()
