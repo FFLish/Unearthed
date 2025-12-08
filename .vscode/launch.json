@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Upload to Pybricks Hub via BLE",
+            "type": "python",
+            "request": "launch",
+            "program": "upload_ble.py",
+            "console": "integratedTerminal",
+            "env": {
+                "PROGRAM": "main.py",
+                "HUB_NAME": ""
+            }
+        }
+    ]
+}
