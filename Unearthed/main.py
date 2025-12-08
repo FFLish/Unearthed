@@ -257,14 +257,14 @@ def run5():
         drb_t(15,200)
         drb_m(20,300)
         drb_m(-100,300)
-        drb_t(133, 300)
+        drb_t(131, 300)
         rmkmove(620, 900)
-        drb_m(320, 400)
+        drb_m(318, 400)
         rmkmove(150, -400)
-        drb_t(20, 300)
-        rmkmove(230, -400)
+        drb_t(30, 300)
+        rmkmove(220, -400)
         print("A:13")#firebase
-        drb_k(-120, 75, -300)
+        drb_k(-120, 80, -300)
         drb_m(800, 600)
 
 
