@@ -1,39 +1,140 @@
-# bridge_firebase.py - EINFACHE VERSION
+# bridge_firebase.py - CLEAN & FAST VERSION
 import os
 import time
-import json
-import requests
 from datetime import datetime
 import glob
 import re
+import firebase_admin
+from firebase_admin import credentials, db
 
+# Firebase
+SERVICE_ACCOUNT = "firebase-service-key.json"
 FIREBASE_URL = "https://fll-scorer-55c47-default-rtdb.europe-west1.firebasedatabase.app"
 
-# Globale Variablen
+# Init Firebase
+def init_firebase():
+    if not os.path.exists(SERVICE_ACCOUNT):
+        print("❌ Service Account fehlt")
+        return False
+    
+    try:
+        cred = credentials.Certificate(SERVICE_ACCOUNT)
+        firebase_admin.initialize_app(cred, {'databaseURL': FIREBASE_URL})
+        print("✅ Firebase ready")
+        return True
+    except Exception as e:
+        print(f"❌ Firebase error: {e}")
+        return False
+
+# Firebase functions
+def firebase_set(path, value):
+    try:
+        db.reference(path).set(value)
+        return True
+    except:
+        return False
+
+def firebase_delete(path):
+    try:
+        db.reference(path).delete()
+        return True
+    except:
+        return False
+
+# Global vars
 current_session = None
 current_run = None
-battery_voltage = None
 
-def find_pybricks_log():
-    """Findet oder wartet auf Pybricks Log-Dateien"""
+# Event handlers
+def handle_start():
+    global current_session
+    
+    current_session = datetime.now().strftime("%Y%m%d_%H%M%S")
+    current_time = datetime.now().strftime("%H:%M:%S")
+    
+    print(f"🚀 START {current_session}")
+    
+    # Altes 2_30 komplett löschen
+    firebase_delete("2_30")
+    
+    # 2_30 mit ID und allen Ordnern erstellen
+    firebase_set("2_30", {
+        "id": current_session,
+        "runs": {
+            "session_started": current_session
+        },
+        "missions": {
+            "session_started": current_session
+        },
+        "devices": {
+            current_time: "Boseidon"  # Erster Eintrag im devices Ordner
+        }
+    })
+
+def handle_restart():
+    print("🔄 RESTART")
+    
+    # Altes 2_30 löschen und neuen starten
+    firebase_delete("2_30")
+    
+    handle_start()
+
+def handle_battery(voltage):
+    print(f"🔋 {voltage}V")
+    try:
+        v = float(voltage) if '.' in voltage else int(voltage)
+        firebase_set("battery", v)
+    except:
+        pass
+
+def handle_run(run_num, event_type, run_time=None):
+    global current_run
+    
+    timestamp = datetime.now().strftime("%H:%M:%S")
+    
+    if event_type == "start":
+        current_run = run_num
+        print(f"🏁 RUN {run_num} START")
+        # Uhrzeit als Key, Event als Value
+        firebase_set(f"2_30/runs/{timestamp}", f"run{run_num}_start")
+        
+    elif event_type == "stop!":
+        print(f"✋ RUN {run_num} STOP")
+        firebase_set(f"2_30/runs/{timestamp}", f"run{run_num}_stop")
+        current_run = None
+        
+    elif event_type == "finish":
+        # UNBEDINGT die Zeit mit übertragen
+        if run_time:
+            print(f"✅ RUN {run_num} DONE - {run_time}s")
+            # Uhrzeit als Key, Event + Zeit als Value
+            firebase_set(f"2_30/runs/{timestamp}", f"run{run_num}_finish,{run_time}")
+        else:
+            print(f"✅ RUN {run_num} DONE")
+            firebase_set(f"2_30/runs/{timestamp}", f"run{run_num}_finish")
+        current_run = None
+
+def handle_mission(code):
+    print(f"🎯 MISSION: {code}")
+    # Uhrzeit als Key, Mission-Code als Value
+    timestamp = datetime.now().strftime("%H:%M:%S")
+    firebase_set(f"2_30/missions/{timestamp}", code)
+
+def handle_device_offline():
+    """Setzt einen Offline-Eintrag im devices-Verzeichnis"""
+    timestamp = datetime.now().strftime("%H:%M:%S")
+    print(f"📵 DEVICE OFFLINE - {timestamp}")
+    firebase_set(f"2_30/devices/{timestamp}", "offline")
+
+# Log file
+def find_log():
     logs_path = r"C:\Users\zinssejo\AppData\Roaming\Code\logs"
     
     if not os.path.exists(logs_path):
-        print(f"FEHLER: VS Code Log-Ordner nicht gefunden: {logs_path}")
         return None
     
-    print("SUCHE PYBRICKS LOG-DATEIEN...")
-    print("-" * 50)
-    
-    for attempt in range(1, 6):
-        print(f"Versuche {attempt}/5...")
-        
-        patterns = [
-            os.path.join(logs_path, "**", "*pybricks*.log"),
-            os.path.join(logs_path, "**", "*Pybricks*.log"),
-            os.path.join(logs_path, "**", "*output*.log"),
-        ]
-        
+    for attempt in range(5):
+        patterns = [os.path.join(logs_path, "**", "*pybricks*.log")]
         all_logs = []
         for pattern in patterns:
             all_logs.extend(glob.glob(pattern, recursive=True))
@@ -41,260 +142,69 @@ def find_pybricks_log():
         all_logs = list(set(all_logs))
         
         if not all_logs:
-            print("  Keine Log-Dateien gefunden.")
-            print("  Warte 5 Sekunden...")
-            time.sleep(5)
+            time.sleep(2)
             continue
         
-        print(f"  Gefunden: {len(all_logs)} Log-Dateien")
-        
+        # Find latest
         best_log = None
-        best_freshness = 0
+        latest_time = 0
         
-        for log_file in all_logs:
+        for log in all_logs:
             try:
-                size = os.path.getsize(log_file)
-                mod_time = os.path.getmtime(log_file)
-                time_diff = time.time() - mod_time
-                
-                filename = os.path.basename(log_file)
-                print(f"    {filename}: {size/1024:.1f} KB")
-                
-                if size > 50 and time_diff < 300:
-                    freshness = size / (time_diff + 1)
-                    if freshness > best_freshness:
-                        best_freshness = freshness
-                        best_log = log_file
-                        
+                mod_time = os.path.getmtime(log)
+                if mod_time > latest_time and os.path.getsize(log) > 50:
+                    latest_time = mod_time
+                    best_log = log
             except:
                 continue
         
         if best_log:
-            size = os.path.getsize(best_log) / 1024
-            mod_str = time.strftime('%H:%M:%S', time.localtime(os.path.getmtime(best_log)))
-            
-            print(f"\nOK: AKTIVE LOG-DATEI GEFUNDEN!")
-            print(f"   DATEI: {os.path.basename(best_log)}")
-            print(f"   GROESSE: {size:.1f} KB")
-            print(f"   LETZTE AENDERUNG: {mod_str}")
+            print(f"📄 Log: {os.path.basename(best_log)}")
             return best_log
-        else:
-            print(f"  {len(all_logs)} Logs gefunden, aber keine aktiven.")
-            print(f"  Warte 5 Sekunden...")
-            time.sleep(5)
+        
+        time.sleep(2)
     
-    print("\nFEHLER: KEINE AKTIVE LOG-DATEI GEFUNDEN!")
     return None
 
-def delete_robogame():
-    """Löscht komplett robogame"""
-    try:
-        response = requests.delete(f"{FIREBASE_URL}/robogame.json", timeout=3)
-        print("🗑️  RoboGame komplett gelöscht")
-        return True
-    except Exception as e:
-        print(f"✗ Fehler beim Löschen: {e}")
-        return False
-
-def create_empty_robogame():
-    """Erstellt leeres RoboGame mit leeren Listen"""
-    try:
-        robogame_data = {
-            "runs": [],
-            "missions": []
-        }
-        response = requests.put(f"{FIREBASE_URL}/robogame.json", json=robogame_data, timeout=5)
-        
-        if response.status_code == 200:
-            print("✓ RoboGame mit leeren Listen erstellt")
-            return True
-        else:
-            print(f"✗ Fehler: {response.status_code}")
-            return False
-    except Exception as e:
-        print(f"✗ Fehler: {e}")
-        return False
-
-def update_battery(voltage):
-    """Aktualisiert Batteriewert (überschreibt)"""
-    global battery_voltage
-    battery_voltage = voltage
-    print(f"🔋 BATTERIE: {voltage}V")
-    
-    try:
-        data = {'voltage': float(voltage) if '.' in voltage else int(voltage)}
-        response = requests.put(
-            f"{FIREBASE_URL}/battery.json", 
-            json=data, 
-            timeout=3
-        )
-        if response.status_code == 200:
-            print(f"   ✓ Batterie aktualisiert: {voltage}V")
-    except Exception as e:
-        print(f"   ✗ Batterie-Fehler: {e}")
-
-def add_to_runs_list(run_event):
-    """Fügt ein Run-Event zur Runs-Liste hinzu - EINFACHE VERSION"""
-    try:
-        # Hole die aktuelle runs-Liste
-        response = requests.get(f"{FIREBASE_URL}/robogame/runs.json", timeout=3)
-        
-        runs_list = []
-        if response.status_code == 200 and response.text != "null":
-            try:
-                data = response.json()
-                if isinstance(data, list):
-                    runs_list = data
-            except:
-                pass
-        
-        # Füge neues Event hinzu
-        runs_list.append(run_event)
-        
-        # Speicere zurück
-        response = requests.put(
-            f"{FIREBASE_URL}/robogame/runs.json",
-            json=runs_list,
-            timeout=3
-        )
-        
-        if response.status_code == 200:
-            print(f"   ✓ Run hinzugefügt: {run_event}")
-        else:
-            print(f"   ✗ Konnte nicht speichern: {response.status_code}")
-            
-    except Exception as e:
-        print(f"   ✗ Fehler: {e}")
-
-def add_to_missions_list(mission_code):
-    """Fügt eine Missionsnummer zur Missions-Liste hinzu - EINFACHE VERSION"""
-    try:
-        # Hole die aktuelle missions-Liste
-        response = requests.get(f"{FIREBASE_URL}/robogame/missions.json", timeout=3)
-        
-        missions_list = []
-        if response.status_code == 200 and response.text != "null":
-            try:
-                data = response.json()
-                if isinstance(data, list):
-                    missions_list = data
-            except:
-                pass
-        
-        # Füge Missionsnummer hinzu
-        missions_list.append(mission_code)
-        
-        # Speicere zurück
-        response = requests.put(
-            f"{FIREBASE_URL}/robogame/missions.json",
-            json=missions_list,
-            timeout=3
-        )
-        
-        if response.status_code == 200:
-            print(f"   ✓ Mission hinzugefügt: {mission_code}")
-        else:
-            print(f"   ✗ Konnte nicht speichern: {response.status_code}")
-            
-    except Exception as e:
-        print(f"   ✗ Fehler: {e}")
-
-def handle_program_start():
-    """Behandelt Programmstart - Löscht und erstellt neu"""
-    global current_session
-    
-    now = datetime.now()
-    current_session = now.strftime("%Y-%m-%d_%H-%M")
-    
-    print(f"\n🚀 PROGRAMM START - Session: {current_session}")
-    
-    # 1. Altes RoboGame löschen
-    delete_robogame()
-    
-    # 2. Neues leeres RoboGame erstellen
-    create_empty_robogame()
-
-def handle_restart():
-    """Behandelt Restart - Gleiche wie program start"""
-    global current_session
-    
-    print(f"\n🔄 RESTART")
-    
-    # 1. Altes RoboGame löschen
-    delete_robogame()
-    
-    # 2. Neues leeres RoboGame erstellen
-    create_empty_robogame()
-    
-    # Session neu starten
-    now = datetime.now()
-    current_session = now.strftime("%Y-%m-%d_%H-%M")
-    print(f"   Neue Session: {current_session}")
-
-def handle_run_event(run_num, event_type, time_value=None):
-    """Behandelt Run-Events"""
-    global current_run
-    
-    if event_type == "start":
-        current_run = run_num
-        print(f"\n🏁 RUN {run_num} START")
-        add_to_runs_list(f"run{run_num}_start")
-        
-    elif event_type == "stop!":
-        print(f"✋ RUN {run_num} STOPP")
-        add_to_runs_list(f"run{run_num}_stop")
-        current_run = None
-        
-    elif event_type == "finish":
-        run_time = None
-        if time_value:
-            run_time = time_value
-            print(f"✅ RUN {run_num} FERTIG - Zeit: {run_time}s")
-            add_to_runs_list(f"run{run_num}_finish,{run_time}")
-        else:
-            print(f"✅ RUN {run_num} FERTIG")
-            add_to_runs_list(f"run{run_num}_finish")
-        current_run = None
-
-def handle_mission(mission_code):
-    """Behandelt Mission"""
-    print(f"🎯 MISSION: {mission_code}")
-    add_to_missions_list(mission_code)
-
-class FileMonitor:
+# Monitor
+class Monitor:
     def __init__(self, filepath):
         self.filepath = filepath
         self.last_size = 0
-        print(f"UEBERWACHE: {os.path.basename(filepath)}")
-        
-    def monitor(self):
-        """Ueberwacht Dateiaenderungen"""
+        self.last_valid_size = 0
+        self.empty_counter = 0
+        self.max_empty_checks = 3  # Wie oft auf Leerheit prüfen, bevor als offline markiert
+    
+    def run(self):
         try:
-            if not os.path.exists(self.filepath):
-                print(f"FEHLER: Datei nicht mehr gefunden!")
-                return False
-            
             with open(self.filepath, 'r', encoding='utf-8', errors='ignore') as f:
                 f.seek(0, 2)
                 self.last_size = f.tell()
+                self.last_valid_size = self.last_size
                 
-                print(f"STARTGROESSE: {self.last_size} bytes")
-                print("WARTE AUF DATEN VON SPIKE PRIME...")
-                print("-" * 50)
-                
-                last_activity = time.time()
+                print("\n📡 Monitoring...")
+                print("=" * 40)
                 
                 while True:
                     if not os.path.exists(self.filepath):
-                        print("DATEI GELOESCHT - BEENDE")
+                        print("❌ Log file disappeared")
+                        handle_device_offline()
                         return False
                     
                     current_size = os.path.getsize(self.filepath)
                     
-                    if current_size < self.last_size:
-                        f.seek(0)
-                        self.last_size = 0
-                        current_size = os.path.getsize(self.filepath)
+                    # Prüfe, ob Datei leer geworden ist (0 Bytes)
+                    if current_size == 0 and self.last_valid_size > 0:
+                        self.empty_counter += 1
+                        print(f"⚠️ Log file empty ({self.empty_counter}/{self.max_empty_checks})")
+                        
+                        if self.empty_counter >= self.max_empty_checks:
+                            print("❌ Log file persistently empty - marking as offline")
+                            handle_device_offline()
+                            return False
+                    elif current_size > 0:
+                        self.empty_counter = 0  # Zurücksetzen, wenn Datei wieder Inhalt hat
+                        self.last_valid_size = current_size
                     
                     if current_size > self.last_size:
                         f.seek(self.last_size)
@@ -302,126 +212,88 @@ class FileMonitor:
                         self.last_size = current_size
                         
                         if new_data:
-                            self.process_new_data(new_data)
-                            last_activity = time.time()
+                            self.process(new_data)
                     
-                    if time.time() - last_activity > 30:
-                        self.show_status()
-                        last_activity = time.time()
-                    
-                    time.sleep(0.1)
+                    time.sleep(0.05)
                     
         except Exception as e:
-            print(f"FEHLER: {e}")
+            print(f"Monitor error: {e}")
+            handle_device_offline()
             return False
     
-    def process_new_data(self, new_data):
-        """Verarbeitet die Daten"""
-        lines = new_data.splitlines()
-        
-        for line in lines:
+    def process(self, new_data):
+        for line in new_data.splitlines():
             line = line.strip()
             if not line:
                 continue
             
-            # Entferne Zeitstempel
-            clean_line = line
+            # Remove timestamp
             if len(line) > 12 and line[2] == ':' and line[5] == ':':
-                clean_line = line[12:].strip()
+                line = line[12:].strip()
             
             # RESTART
-            if clean_line.lower().startswith("restart"):
+            if line.lower().startswith("restart"):
                 handle_restart()
             
             # PROGRAM START
-            elif clean_line.startswith("program start"):
-                handle_program_start()
+            elif line.startswith("program start"):
+                handle_start()
             
             # BATTERY
-            elif clean_line.startswith("battery"):
-                match = re.search(r'(\d+\.?\d*)', clean_line)
+            elif line.startswith("battery"):
+                match = re.search(r'(\d+\.?\d*)', line)
                 if match:
-                    voltage = match.group(1)
-                    update_battery(voltage)
+                    handle_battery(match.group(1))
             
             # RUN
-            elif clean_line.startswith("run"):
-                time_match = re.search(r'finish,(\d+\.?\d+)', clean_line)
+            elif line.startswith("run"):
+                time_match = re.search(r'finish,(\d+\.?\d+)', line)
                 time_value = time_match.group(1) if time_match else None
                 
-                if "start" in clean_line:
-                    run_num = clean_line.replace("run", "").replace("start", "").strip()
-                    handle_run_event(run_num, "start")
+                if "start" in line:
+                    run_num = line.replace("run", "").replace("start", "").strip()
+                    handle_run(run_num, "start")
                     
-                elif "stop!" in clean_line:
-                    run_num = clean_line.replace("run", "").replace("stop!", "").strip()
-                    handle_run_event(run_num, "stop!")
+                elif "stop!" in line:
+                    run_num = line.replace("run", "").replace("stop!", "").strip()
+                    handle_run(run_num, "stop!")
                     
-                elif "finish" in clean_line:
-                    clean_for_run = re.sub(r',\d+\.?\d+', '', clean_line)
-                    run_num = clean_for_run.replace("run", "").replace("finish", "").strip()
-                    handle_run_event(run_num, "finish", time_value)
+                elif "finish" in line:
+                    clean_line = re.sub(r',\d+\.?\d+', '', line)
+                    run_num = clean_line.replace("run", "").replace("finish", "").strip()
+                    handle_run(run_num, "finish", time_value)
             
-            # A: MISSIONEN
-            elif clean_line.startswith("A:"):
-                mission_code = clean_line[2:].strip()
-                handle_mission(mission_code)
-    
-    def show_status(self):
-        """Zeigt Status an"""
-        try:
-            if os.path.exists(self.filepath):
-                size_kb = os.path.getsize(self.filepath) / 1024
-                
-                print(f"\n📊 STATUS")
-                print(f"   Datei: {os.path.basename(self.filepath)}")
-                print(f"   Größe: {size_kb:.1f} KB")
-                print(f"   Session: {current_session or 'Keine'}")
-                print(f"   Aktiver Run: {current_run or 'Keiner'}")
-                print(f"   Batterie: {battery_voltage or 'Unbekannt'}V")
-                print("-" * 40)
-        except:
-            pass
+            # MISSION
+            elif line.startswith("A:"):
+                code = line[2:].strip()
+                handle_mission(code)
 
+# Main
 def main():
-    print("="*60)
-    print("SPIKE PRIME -> FIREBASE BRIDGE")
-    print("EINFACHE VERSION: Löscht RoboGame bei Start/Restart")
-    print("="*60)
+    print("="*50)
+    print("SPIKE → FIREBASE BRIDGE (2:30 MODUS)")
+    print("="*50)
     
-    print("\n⚠️  WICHTIG: RoboGame wird bei 'program start' oder 'restart' gelöscht!")
-    print("   Alle alten Daten gehen verloren!")
-    
-    print("\nSUCHE LOG-DATEI...")
-    target_file = find_pybricks_log()
-    
-    if not target_file:
-        print("\nBRIDGE KANN NICHT STARTEN.")
-        print("Bitte VS Code mit Pybricks starten und SPIKE verbinden.")
+    if not init_firebase():
         return
     
-    print("\n" + "="*60)
-    print("BRIDGE LÄUFT...")
-    print("="*60)
+    log_file = find_log()
+    if not log_file:
+        print("No log file found")
+        return
     
-    monitor = FileMonitor(target_file)
+    monitor = Monitor(log_file)
     
-    print("\nBRIDGE BEREIT!")
-    print("\nFEUERFREI! Starte dein SPIKE-Programm in VS Code")
-    print("\nBei 'program start' oder 'restart':")
-    print("  - Altes RoboGame wird gelöscht")
-    print("  - Neues leeres RoboGame wird erstellt")
-    print("\nDrücke STRG+C zum Beenden")
-    print("="*60)
+    print("\n✅ READY - Start SPIKE program")
+    print("="*50)
     
     try:
-        monitor.monitor()
+        monitor.run()
     except KeyboardInterrupt:
-        print("\n✓ BRIDGE GESTOPPT")
+        print("\nStopped")
     except Exception as e:
-        print(f"\n✗ FEHLER: {e}")
-    
-    print("\nBRIDGE BEENDET")
+        print(f"Error: {e}")
+        handle_device_offline()
 
 if __name__ == "__main__":
     main()

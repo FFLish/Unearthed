@@ -9,7 +9,7 @@ echo ┌────────────────────────
 echo │   Prüfe Pfad...                          │
 echo └──────────────────────────────────────────┘
 
-set "BRIDGE_PATH=C:\Users\zinssejo\Documents\pybricks\Unearthed\Unearthed\firebase"
+set "BRIDGE_PATH=C:\Users\zinssejo\Documents\Unearthed_FLL\pybricks\Unearthed\firebase"
 set "BRIDGE_FILE=%BRIDGE_PATH%\bridge_firebase.py"
 
 echo.

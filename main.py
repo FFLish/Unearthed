@@ -119,6 +119,7 @@ def drb_m_rmk(distance, speed, rmk_angle, rmk_speed):
 def run1(): 
     watch = StopWatch()
     try:
+        print("battery",hub.battery.voltage() / 1000)
         drb_m(100,600)
         drb_k(100,-60,200)
         drb_m(390,500)
@@ -154,17 +155,20 @@ def run1():
 def run2():
     watch = StopWatch()
     try:
-        drb_k(2430, -15, 500)
-        drb_t(55, 600)
-        drb_m_rmk(130,600,150,400)
+        drb_m(100,500)
+        drb_k(800, -35, 500)
+        drb_m(112,500)
+        drb_t(82, 600)
+        drb_m_rmk(150,700,150,250)
         drb_m(210,600)
         lmkmove(170,800)
-        rmkmove(200,-600)
+        rmkmove(120,-300)
         wait(500)
-        drb_m(-130,500)
+        drb_m(-160,500)
         drb_t(-40,500)
-        drb_m(-300,500)
-        drb_k(-250,75,800)
+        drb_m_rmk(-300,500,100,-80)
+        drb_k(-250,95,800)
+
        
 
 
@@ -195,8 +199,9 @@ def run3():
         rmkmove(380, 800)
         wait(200)
         lmkmove(110, -1000)
-        lmkmove(110, 1000)
+        lmkmove(120, 1000)
         drb_m_rmk(-170, 1000, 500, -250)
+        print("A:04")#firebase
         drb_m(40, 800)
         rmkmove(200, -900)
         drb_k(-700, 40, 900)
@@ -406,14 +411,9 @@ def run9():
     var = int(hub_menu("0","1","2","3","4","5","6","7","8","9"))
 
 def run0():
-    watch = StopWatch()
     try:
         print("restart")#firebase
-        
-        drb.stop()
-        drb.stop()
-        lmk.brake()
-        rmk.brake()
+        print("battery",hub.battery.voltage() / 1000)
 
     except StopRun as e:
         print("")
@@ -431,6 +431,7 @@ while True:
     try:
         if var == 1:
             print("run1 start")
+            print("battery",hub.battery.voltage() / 1000)
             run1()
         elif var == 2:
             print("run2 start")
