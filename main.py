@@ -10,6 +10,11 @@ from pybricks.hubs import PrimeHub
 hub = PrimeHub()
 
 hub.system.set_stop_button({Button.BLUETOOTH})
+
+# GLOBALE VARIABLEN FÜR 2:30 SESSION
+session_watch = None  # StopWatch für die gesamte Session
+session_start_time = None  # Startzeit in Millisekunden
+
 class StopRun(Exception):
     def __init__(self, message: str = "", stop_program: bool = False):
         super().__init__(message)
@@ -116,29 +121,26 @@ def drb_m_rmk(distance, speed, rmk_angle, rmk_speed):
             raise StopRun("ENDE GELÄNDE!")
     
     rmk.brake()
+
 def run1(): 
     watch = StopWatch()
     try:
-        print("battery",hub.battery.voltage() / 1000)
         drb_m(100,600)
         drb_k(100,-60,200)
         drb_m(390,500)
         drb_k(280,-62,900)
         drb_m(34,500)
         drb_k(87,87,500)
-        drb_m(-10,500)
-        drb_m(30,500)
-        rmkmove(800,900)
-        lmkmove(200, 800)
+        drb_m(40,500)
+        rmkmove(780,900)#Lore klauen
+        lmkmove(200, 800)#Flagge aufstellen
+        print("A:03")#firebase
         drb_m(-70,500)
         rmkmove(800,-900)
         drb_k(-40,-62,900)
         drb_k(270,120,500)
         drb_m(380,900)
         drb_k(90,-95,500)
-
-
-
         elapsed_time = watch.time()
         elapsed_seconds = elapsed_time / 1000
 
@@ -159,21 +161,19 @@ def run2():
         drb_k(800, -35, 500)
         drb_m(112,500)
         drb_t(82, 600)
-        drb_m_rmk(150,700,150,250)
+        drb_m_rmk(150,700,140,250)#Schweres Heben
+        print("A:07")#firebase
         drb_m(210,600)
-        lmkmove(170,800)
+        lmkmove(170,800)#Schmiede 
         rmkmove(120,-300)
+        print("A:06")#firebase
         wait(500)
         drb_m(-160,500)
-        drb_t(-40,500)
+        drb_t(-40,500)#Landkarte Hoch
+        print("A:05")#firebase
         drb_m_rmk(-300,500,100,-80)
         drb_k(-250,95,800)
-
-       
-
-
-        drb.stop()
-        
+        drb.stop()        
         elapsed_time = watch.time()
         elapsed_seconds = elapsed_time / 1000
 
@@ -190,13 +190,13 @@ def run2():
 def run3():
     watch = StopWatch()
     try:
-
         drb_m(150, 800)
         drb_t(-90, 700)
         drb_m(165, 800)
         drb_t(45, 700)
         drb_m(330, 800)
-        rmkmove(380, 800)
+        rmkmove(380, 800)#Aktuelle Angebote hochheben
+        print("A:09")#firebase
         wait(200)
         lmkmove(110, -1000)
         lmkmove(120, 1000)
@@ -205,8 +205,6 @@ def run3():
         drb_m(40, 800)
         rmkmove(200, -900)
         drb_k(-700, 40, 900)
-        lmkmove(150, -1000)
-
         elapsed_time = watch.time()
         elapsed_seconds = elapsed_time / 1000
 
@@ -225,14 +223,13 @@ def run4():
     watch = StopWatch()
     try:
         drb_m(420,400)
-        rmkmove(70,-800)
-        rmkmove(70,800)
-        rmkmove(70,-800)
-        rmkmove(70,800)
-        rmkmove(70,-800)
-        rmkmove(70,800)
+        rmkmove(70,-800)#Mehr runter damit er beim hochgehen nicht immer dagegenhaut
+        for _ in range(2):
+         rmkmove(60,800)
+         rmkmove(60,-800)
+        rmkmove(60,800)
         print("A:08")#firebase
-        drb_m(-590,400)
+        drb_m(-360,400)
 
 
         elapsed_time = watch.time()
@@ -251,25 +248,25 @@ def run4():
 def run5():
     watch = StopWatch()
     try:
-        drb_m(220, 800)
+        drb_m(210, 800)
         drb_t(-90, 500)
-        drb_m(660, 600)
+        drb_m(655, 600)
         drb_t(-90, 400)
-        drb_m(230, 300)
+        drb_m(110, 300)
         drb_t(-15,200)
-        lmkmove(1100,900)
+        lmkmove(1100,900)#Anglerartefakt
         print("A:11")#firebase
         drb_t(15,200)
         drb_m(20,300)
         drb_m(-100,300)
-        drb_t(131, 300)
+        drb_t(128, 300)
         rmkmove(620, 900)
         drb_m(318, 400)
         rmkmove(150, -400)
-        drb_t(30, 300)
-        rmkmove(220, -400)
+        drb_t(35, 300)
+        rmkmove(220, -400)#Statue rekpnstruieren
         print("A:13")#firebase
-        drb_k(-120, 80, -300)
+        drb_k(-120, 85, -300)
         drb_m(800, 600)
 
 
@@ -290,16 +287,16 @@ def run5():
 def run6():
     watch = StopWatch()
     try:
-        drb_m(735, 500)
+        drb_m(742, 500)
         drb_t(30, 500)
         drb_m(170, 400)
         drb_k(90, 60, 500)
-        drb_m(130, 500)
-        lmkmove(33,-400)
+        drb_m(130, 300)
+        lmkmove(40,-400)
         rmkmove(200,500)
-        rmkmove(190,-900)
+        rmkmove(190,-900)#vorsichtige Bergungsaktion
         print("A:04")#firebase
-        drb_m(-170,300)
+        drb_m(-170,300)#Lore rüberschieben
         print("A:03,1")#firebase
         lmkmove(7,-900)
         drb_t(100,500)
@@ -322,12 +319,8 @@ def run6():
 def run7():
     watch = StopWatch()
     try:
-
-
-
-        drb_m(460, 900)
-        rmkmove(120, 800)
-        drb_m(40, 900)
+        drb_m(500, 900)
+        rmkmove(120, -800)#Bergungsaktion und dritte Flage abstellen
         print("A:12")#firebase
         print("A:15,3")#firebase
         drb_m(-200, 900)
@@ -351,26 +344,24 @@ def run7():
 def run8():
     watch = StopWatch()
     try:
-
-
-        drb_m(760, 800)
+        drb_m(770, 800)
         drb_t(-42, 500)
-        drb_m(180, 300)
-        lmkmove(100, 600)
-        print("A:02")#firebase
-        drb_m(-110, 500)
+        drb_m(180, 300)#Landkarten enthüllen
+        print("A:2,1")#firebase
+        print("A:2,2")#firebase
+        lmkmove(100, 600)#Mutterboden hochheben
+        print("A:2,3")#firebase
+        drb_m(-100, 500)
         drb_t(42, 300)
-        drb_m(-130, 150)
-        rmkmove(50, 700)#Landkarte hoch
-        drb_m(-35, 150)
-        wait(500)
-        lmkmove(400, 800)#dreizack runter
-        lmkmove(250, -900)
-        rmkmove(100, 900)  
-        print("A:01")#firebase     
+        drb_m(-55, 350)
+        rmkmove(100, -700)#Flagge abwerfen
         print("A:15,2")#firebase
-        drb_m(-630, 1000)
-
+        drb_m(-115, 150)
+        wait(500)
+        lmkmove(500, 800)#Pinsel Gefangen
+        print("A:1")#firebase
+        lmkmove(350, -600)    
+        drb_k(-1100, -25, 800)
        
         drb.stop()
         lmk.brake()
@@ -391,8 +382,8 @@ def run9():
     watch = StopWatch()
     try:
         drb_m(100, 1000)
-        drb_k(250, 50, 700)
-        drb_m(200, 900)
+        drb_k(270, 49, 700)
+        drb_m(200, 900)#alles rein
         print("A:14")#firebase
         drb_m(-300, 900)
         drb.stop()
@@ -406,6 +397,22 @@ def run9():
         print("run9 stop!")
     else:
         print("run9 finish,", elapsed_seconds)
+        
+        # BERECHNE GESAMTZEIT DER 2:30 SESSION
+        global session_watch, session_start_time
+        if session_watch is not None:
+            total_session_time = session_watch.time()  # Zeit in Millisekunden
+            total_session_seconds = total_session_time / 1000  # Zeit in Sekunden
+            
+            # Hier wird die Gesamtzeit mit ausgegeben
+            print("2_30 finish,", total_session_seconds)
+        else:
+            print("2_30 finish")  
+            
+        # Session beenden
+        session_watch = None
+        session_start_time = None
+        
     drb.stop()
     global var
     var = int(hub_menu("0","1","2","3","4","5","6","7","8","9"))
@@ -430,8 +437,15 @@ except Exception:
 while True:
     try:
         if var == 1:
+            print("2_30 start")
             print("run1 start")
             print("battery",hub.battery.voltage() / 1000)
+            # 2:30 SESSION STARTEN
+            if session_watch is None:
+                session_watch = StopWatch()
+                session_start_time = session_watch.time()
+                print("2_30 start") 
+            
             run1()
         elif var == 2:
             print("run2 start")
@@ -466,6 +480,13 @@ while True:
                 print("Stopping program:", e.message)
             else:
                 print("Stopping program")
+            
+            # Falls die Session noch läuft, beende sie
+            if session_watch is not None:
+                total_time = session_watch.time()
+                print("2_30 stop!,", total_time / 1000)
+                session_watch = None
+            
             break
 
         # Otherwise, only stop the current run and return to the menu.
@@ -473,8 +494,13 @@ while True:
             print("Run stopped:", e.message)
         else:
             print("Run stopped")
+            
+        # Wenn während einer Session gestoppt wird
+        if session_watch is not None:
+            total_time = session_watch.time()
+            print("run stop!,", total_time / 1000)
+            
         drb.stop()
         lmk.brake()
         rmk.brake()
     wait(100)
-    

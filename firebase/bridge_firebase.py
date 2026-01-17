@@ -66,6 +66,10 @@ def handle_start():
         "missions": {
             "session_started": current_session
         },
+        "activ": {
+            "session_started": current_session,
+            "active": False  # Startwert: nicht aktiv - jetzt im activ Ordner!
+        },
         "devices": {
             current_time: "Boseidon"  # Erster Eintrag im devices Ordner
         }
@@ -73,6 +77,9 @@ def handle_start():
 
 def handle_restart():
     print("🔄 RESTART")
+    
+    # Aktiven Status im activ Ordner auf False setzen
+    firebase_set("2_30/activ/active", False)
     
     # Altes 2_30 löschen und neuen starten
     firebase_delete("2_30")
@@ -120,11 +127,36 @@ def handle_mission(code):
     timestamp = datetime.now().strftime("%H:%M:%S")
     firebase_set(f"2_30/missions/{timestamp}", code)
 
+def handle_230_event(event_type, run_time=None):
+    """Behandelt 2_30 start und 2_30 finish Events - speichert in activ Ordner"""
+    timestamp = datetime.now().strftime("%H:%M:%S")
+    
+    if event_type == "finish":
+        if run_time:
+            print(f"🏆 2:30 FINISH - {run_time}s")
+            # Uhrzeit als Key, Event + Zeit als Value im activ Ordner
+            firebase_set(f"2_30/activ/{timestamp}", f"2_30_finish,{run_time}")
+            # Aktiven Status im activ Ordner auf False setzen
+            firebase_set("2_30/activ/active", False)
+        else:
+            print("🏆 2:30 FINISH")
+            firebase_set(f"2_30/activ/{timestamp}", "2_30_finish")
+            # Aktiven Status im activ Ordner auf False setzen
+            firebase_set("2_30/activ/active", False)
+    elif event_type == "start":
+        print("🚀 2:30 START")
+        # ERST den Eintrag im activ Ordner erstellen
+        firebase_set(f"2_30/activ/{timestamp}", "2_30_start")
+        # DANN den aktiven Status im activ Ordner auf True setzen
+        firebase_set("2_30/activ/active", True)
+
 def handle_device_offline():
     """Setzt einen Offline-Eintrag im devices-Verzeichnis"""
     timestamp = datetime.now().strftime("%H:%M:%S")
     print(f"📵 DEVICE OFFLINE - {timestamp}")
     firebase_set(f"2_30/devices/{timestamp}", "offline")
+    # Wenn offline, dann auch aktiven Status im activ Ordner auf False setzen
+    firebase_set("2_30/activ/active", False)
 
 # Log file
 def find_log():
@@ -267,6 +299,17 @@ class Monitor:
             elif line.startswith("A:"):
                 code = line[2:].strip()
                 handle_mission(code)
+            
+            # 2_30 EVENTS
+            elif line.startswith("2_30"):
+                time_match = re.search(r'finish,(\d+\.?\d+)', line)
+                time_value = time_match.group(1) if time_match else None
+                
+                if "start" in line:
+                    handle_230_event("start")
+                    
+                elif "finish" in line:
+                    handle_230_event("finish", time_value)
 
 # Main
 def main():
@@ -291,6 +334,8 @@ def main():
         monitor.run()
     except KeyboardInterrupt:
         print("\nStopped")
+        # Beim manuellen Stopp auch aktiven Status im activ Ordner auf False setzen
+        firebase_set("2_30/activ/active", False)
     except Exception as e:
         print(f"Error: {e}")
         handle_device_offline()
