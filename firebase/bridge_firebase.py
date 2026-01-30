@@ -1,4 +1,4 @@
-# bridge_firebase.py - CLEAN & FAST VERSION
+# bridge_firebase.py - KORRIGIERTE VERSION
 import os
 import time
 from datetime import datetime
@@ -6,10 +6,22 @@ import glob
 import re
 import firebase_admin
 from firebase_admin import credentials, db
+import threading
 
 # Firebase
 SERVICE_ACCOUNT = "firebase-service-key.json"
 FIREBASE_URL = "https://fll-scorer-55c47-default-rtdb.europe-west1.firebasedatabase.app"
+
+# Timer Konfiguration
+MAX_TIMER_VALUE = 150  # 2:30 in Sekunden
+MIN_TIMER_VALUE = -120  # -2:00 in Sekunden
+INITIAL_TIMER_VALUE = 149  # Startet bei 2:29
+
+# Globale Timer-Variablen
+timer_active = False
+timer_seconds = INITIAL_TIMER_VALUE
+timer_thread = None
+last_timer_update = 0
 
 # Init Firebase
 def init_firebase():
@@ -41,6 +53,99 @@ def firebase_delete(path):
     except:
         return False
 
+# Helper: Setzt active und time separat
+def set_active(value):
+    """Setzt nur active"""
+    firebase_set("2_30/activ/active", value)
+    print(f"📊 Active auf {value} gesetzt")
+
+def set_time(value):
+    """Setzt nur time"""
+    firebase_set("2_30/activ/time", value)
+    print(f"⏰ Time auf {value} gesetzt")
+
+# Helper: Format Sekunden in MM:SS oder -MM:SS
+def format_timer(seconds):
+    """Formatiert Sekunden in MM:SS Format mit optionalem Minuszeichen"""
+    sign = "-" if seconds < 0 else ""
+    abs_seconds = abs(int(seconds))
+    minutes = abs_seconds // 60
+    secs = abs_seconds % 60
+    return f"{sign}{minutes:01d}:{secs:02d}"
+
+# Timer-Funktionen
+def start_timer():
+    """Startet den Countdown-Timer - SCHNELL & GENAU"""
+    global timer_active, timer_seconds, timer_thread, last_timer_update
+    
+    if timer_active:
+        return
+    
+    timer_active = True
+    timer_seconds = INITIAL_TIMER_VALUE  # Start bei 2:29
+    last_timer_update = time.time()
+    
+    # Timer im Hintergrund laufen lassen
+    timer_thread = threading.Thread(target=timer_worker, daemon=True)
+    timer_thread.start()
+    print(f"⏱️ Timer gestartet bei {format_timer(timer_seconds)}")
+    
+    # Sofort aktualisieren
+    update_timer_display()
+
+def stop_timer():
+    """Stoppt den Countdown-Timer"""
+    global timer_active
+    timer_active = False
+    print("⏱️ Timer gestoppt")
+
+def reset_timer():
+    """Setzt den Timer auf 2:30 zurück"""
+    global timer_seconds
+    timer_seconds = MAX_TIMER_VALUE  # 2:30
+    update_timer_display()
+    print(f"⏱️ Timer zurückgesetzt auf {format_timer(timer_seconds)}")
+
+def timer_worker():
+    """Hintergrund-Thread für den Timer - SCHNELL & GENAU"""
+    global timer_active, timer_seconds, last_timer_update
+    
+    print("⏱️ Timer Worker gestartet - schnelle Version")
+    
+    while timer_active:
+        current_time = time.time()
+        elapsed = current_time - last_timer_update
+        
+        # Genau 1 Sekunde abwarten, nicht länger
+        if elapsed >= 1.0:
+            timer_seconds -= 1
+            last_timer_update = current_time
+            
+            # Timer-Display sofort aktualisieren
+            update_timer_display()
+            
+            # Prüfen ob Minimum erreicht
+            if timer_seconds <= MIN_TIMER_VALUE:
+                print(f"⏱️ Timer Minimum erreicht bei {format_timer(timer_seconds)}")
+                stop_timer()
+                # Aktiven Status auf False, time auf Minimum-Wert
+                set_active(False)
+                set_time(format_timer(MIN_TIMER_VALUE))
+                break
+        
+        # Kurze Pause um CPU nicht zu belasten
+        time.sleep(0.01)
+
+def update_timer_display():
+    """Aktualisiert die Timer-Anzeige in Firebase"""
+    global timer_seconds
+    
+    # Timer-Format: 2:29, 2:28, ..., 0:00, -0:01, ..., -2:00
+    timer_display = format_timer(timer_seconds)
+    firebase_set("2_30/activ/time", timer_display)
+    
+
+
 # Global vars
 current_session = None
 current_run = None
@@ -57,6 +162,10 @@ def handle_start():
     # Altes 2_30 komplett löschen
     firebase_delete("2_30")
     
+    # Timer zurücksetzen
+    reset_timer()
+    stop_timer()
+    
     # 2_30 mit ID und allen Ordnern erstellen
     firebase_set("2_30", {
         "id": current_session,
@@ -68,18 +177,30 @@ def handle_start():
         },
         "activ": {
             "session_started": current_session,
-            "active": False  # Startwert: nicht aktiv - jetzt im activ Ordner!
+            "active": False,        # Startwert: nicht aktiv
+            "time": format_timer(MAX_TIMER_VALUE)  # Startwert: 2:30
         },
         "devices": {
             current_time: "Boseidon"  # Erster Eintrag im devices Ordner
         }
     })
+    
+    # Punkte auf 0 setzen
+    firebase_set("2_30/points", 0)
+    
+    # Batterie initial setzen
+    firebase_set("battery", 7.946)
 
 def handle_restart():
     print("🔄 RESTART")
     
-    # Aktiven Status im activ Ordner auf False setzen
-    firebase_set("2_30/activ/active", False)
+    # Bei Restart: Timer stoppen und zurücksetzen
+    stop_timer()
+    reset_timer()
+    
+    # active auf False, time auf 2:30
+    set_active(False)
+    set_time(format_timer(MAX_TIMER_VALUE))
     
     # Altes 2_30 löschen und neuen starten
     firebase_delete("2_30")
@@ -95,18 +216,30 @@ def handle_battery(voltage):
         pass
 
 def handle_run(run_num, event_type, run_time=None):
-    global current_run
+    global current_run, timer_seconds
     
     timestamp = datetime.now().strftime("%H:%M:%S")
     
     if event_type == "start":
         current_run = run_num
         print(f"🏁 RUN {run_num} START")
+        
+        # WENN run-1 startet: active auf True, Timer starten
+        if run_num == "1":
+            set_active(True)
+            start_timer()
+        
         # Uhrzeit als Key, Event als Value
         firebase_set(f"2_30/runs/{timestamp}", f"run{run_num}_start")
         
     elif event_type == "stop!":
         print(f"✋ RUN {run_num} STOP")
+        
+        # WENN run-9 gestoppt wird: Timer stoppen, active auf False
+        if run_num == "9":
+            stop_timer()
+            set_active(False)
+        
         firebase_set(f"2_30/runs/{timestamp}", f"run{run_num}_stop")
         current_run = None
         
@@ -114,10 +247,37 @@ def handle_run(run_num, event_type, run_time=None):
         # UNBEDINGT die Zeit mit übertragen
         if run_time:
             print(f"✅ RUN {run_num} DONE - {run_time}s")
+            
+            # WENN run-9 fertig: Timer stoppen, Zeit berechnen
+            if run_num == "9":
+                stop_timer()
+                set_active(False)
+                
+                # Berechne verbleibende Zeit: 150 - run_time
+                try:
+                    finish_seconds = float(run_time)
+                    remaining = 150 - finish_seconds
+                    remaining_display = format_timer(int(round(remaining)))
+                    set_time(remaining_display)
+                    print(f"   Berechnung: 150 - {finish_seconds} = {remaining}s → {remaining_display}")
+                except:
+                    # Falls Berechnung fehlschlägt
+                    set_time("0:00")
+            
             # Uhrzeit als Key, Event + Zeit als Value
             firebase_set(f"2_30/runs/{timestamp}", f"run{run_num}_finish,{run_time}")
         else:
             print(f"✅ RUN {run_num} DONE")
+            
+            # WENN run-9 fertig OHNE Zeit: Timer anhalten, bei aktueller Zeit bleiben
+            if run_num == "9":
+                stop_timer()
+                set_active(False)
+                # Bei aktueller Zeit bleiben lassen
+                current_display = format_timer(timer_seconds)
+                set_time(current_display)
+                print(f"   Timer angehalten bei: {current_display}")
+            
             firebase_set(f"2_30/runs/{timestamp}", f"run{run_num}_finish")
         current_run = None
 
@@ -126,37 +286,65 @@ def handle_mission(code):
     # Uhrzeit als Key, Mission-Code als Value
     timestamp = datetime.now().strftime("%H:%M:%S")
     firebase_set(f"2_30/missions/{timestamp}", code)
+    
+    # Punkte aus Mission-Code extrahieren (z.B. "A:10" = 10 Punkte)
+    try:
+        if code.startswith("A:"):
+            points_str = code[2:]
+            if points_str.isdigit():
+                points = int(points_str)
+                # Punkte in 2_30/points setzen
+                firebase_set("2_30/points", points)
+                print(f"   Punkte gesetzt auf: {points}")
+    except:
+        pass
 
 def handle_230_event(event_type, run_time=None):
-    """Behandelt 2_30 start und 2_30 finish Events - speichert in activ Ordner"""
-    timestamp = datetime.now().strftime("%H:%M:%S")
+    """Behandelt 2_30 start und 2_30 finish Events"""
     
     if event_type == "finish":
         if run_time:
             print(f"🏆 2:30 FINISH - {run_time}s")
-            # Uhrzeit als Key, Event + Zeit als Value im activ Ordner
-            firebase_set(f"2_30/activ/{timestamp}", f"2_30_finish,{run_time}")
-            # Aktiven Status im activ Ordner auf False setzen
-            firebase_set("2_30/activ/active", False)
+            
+            # WICHTIG: Berechne verbleibende Zeit: 150 - run_time
+            try:
+                finish_seconds = float(run_time)
+                remaining = 150 - finish_seconds
+                remaining_display = format_timer(int(round(remaining)))
+                
+                print(f"   Berechnung: 150 - {finish_seconds} = {remaining}s")
+                print(f"   Ergebnis in time: {remaining_display}")
+                
+                # Timer stoppen und verbleibende Zeit setzen
+                stop_timer()
+                set_active(False)
+                set_time(remaining_display)
+                
+            except Exception as e:
+                print(f"   Fehler bei Berechnung: {e}")
+                # Falls Berechnung fehlschlägt, Timer stoppen
+                stop_timer()
+                set_active(False)
+                set_time("0:00")
         else:
             print("🏆 2:30 FINISH")
-            firebase_set(f"2_30/activ/{timestamp}", "2_30_finish")
-            # Aktiven Status im activ Ordner auf False setzen
-            firebase_set("2_30/activ/active", False)
+            # Timer stoppen, aktiven Status auf False
+            stop_timer()
+            set_active(False)
     elif event_type == "start":
         print("🚀 2:30 START")
-        # ERST den Eintrag im activ Ordner erstellen
-        firebase_set(f"2_30/activ/{timestamp}", "2_30_start")
-        # DANN den aktiven Status im activ Ordner auf True setzen
-        firebase_set("2_30/activ/active", True)
+        # Aktiven Status auf True und Timer starten
+        set_active(True)
+        start_timer()
 
 def handle_device_offline():
     """Setzt einen Offline-Eintrag im devices-Verzeichnis"""
     timestamp = datetime.now().strftime("%H:%M:%S")
     print(f"📵 DEVICE OFFLINE - {timestamp}")
     firebase_set(f"2_30/devices/{timestamp}", "offline")
-    # Wenn offline, dann auch aktiven Status im activ Ordner auf False setzen
-    firebase_set("2_30/activ/active", False)
+    # Timer stoppen, aktiven Status auf False
+    stop_timer()
+    set_active(False)
 
 # Log file
 def find_log():
@@ -314,7 +502,7 @@ class Monitor:
 # Main
 def main():
     print("="*50)
-    print("SPIKE → FIREBASE BRIDGE (2:30 MODUS)")
+    print("SPIKE → FIREBASE BRIDGE (SCHNELLE & KORREKTE VERSION)")
     print("="*50)
     
     if not init_firebase():
@@ -334,8 +522,9 @@ def main():
         monitor.run()
     except KeyboardInterrupt:
         print("\nStopped")
-        # Beim manuellen Stopp auch aktiven Status im activ Ordner auf False setzen
-        firebase_set("2_30/activ/active", False)
+        # Beim manuellen Stopp: Timer stoppen, active auf False
+        stop_timer()
+        set_active(False)
     except Exception as e:
         print(f"Error: {e}")
         handle_device_offline()
