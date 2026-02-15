@@ -234,11 +234,14 @@ def run4():
         lmg.reset_angle(0)
         rmg.reset_angle(0)
         drb_m(420,400)
-        rmkmove(65,-800)#Mehr runter damit er beim hochgehen nicht immer dagegenhaut
-        rmkmove(50,800)
-        rmkmove(50,-800)
-        rmkmove(50,800)
-        rmkmove(50,-800)
+        rmkmove(55,-800)#Mehr runter damit er beim hochgehen nicht immer dagegenhaut
+        rmkmove(40,800)
+        wait(200)
+        rmkmove(40,-800)
+        rmkmove(40,800)
+        wait(200)
+        rmkmove(40,-800)
+        rmkmove(40,-800)
         print("A:08")#firebase
         drb_m(-360,400)
 
@@ -271,7 +274,7 @@ def run5():
         drb_t(15,200)
         drb_m(20,300)
         drb_m(-100,300)
-        drb_t(131, 300)
+        drb_t(129, 300)
         rmkmove(620, 900)
         drb_m(318, 400)
         rmkmove(150, -400)
@@ -298,20 +301,38 @@ def run6():
     try:
         lmg.reset_angle(0)
         rmg.reset_angle(0)
-        drb_m(742, 500)
+        drb_k(3300, 15, 700)
+        drb_t(165, 700)
+        drb_m(-125, 700)
+        drb_m(58, 700)#hier am wettbewerb ändern
+        drb_t(-90, 500)
+        drb_m(140, 500)
+        drb_m(50, 200)
+        lmkmove(45,-400)
+        rmkmove(220,800)#vorsichtige Bergungsaktion^
+        wait(200)
+        print("A:04")#firebase
+        drb_m_rmk(-170,300, 100, 400)#Lore rüberschieben
+        print("A:03,1")#firebas
+        lmkmove(7,-900)
+        drb_t(100,500)
+        drb_m(760,1000)
+
+        '''
+        drb_m(734, 500)
         drb_t(30, 500)
         drb_m(170, 400)
         drb_k(90, 60, 500)
         drb_m(130, 300)
         lmkmove(45,-400)
-        rmkmove(200,500)
-        rmkmove(190,-900)#vorsichtige Bergungsaktion
+        rmkmove(220,800)#vorsichtige Bergungsaktion^
+        wait(200)
         print("A:04")#firebase
-        drb_m(-170,300)#Lore rüberschieben
-        print("A:03,1")#firebase
+        drb_m_rmk(-170,300, 100, 400)#Lore rüberschieben
+        print("A:03,1")#firebas
         lmkmove(7,-900)
         drb_t(100,500)
-        drb_m(760,1000)  
+        drb_m(760,1000)  '''
 
 
         elapsed_time = watch.time()
@@ -334,7 +355,7 @@ def run7():
         rmg.reset_angle(0)
         drb_m(500, 700)
         wait(350)
-        rmkmove(120, -800)#Bergungsaktion und dritte Flage abstellen
+        rmkmove(150, -800)#Bergungsaktion und dritte Flage abstellen
         print("A:12")#firebase
         print("A:15,3")#firebase
         drb_m(-200, 800)
@@ -367,7 +388,7 @@ def run8():
         print("A:2,2")#firebase
         lmkmove(100, 600)#Mutterboden hochheben
         print("A:2,3")#firebase
-        drb_m(-100, 500)
+        drb_m(-110, 500)
         drb_t(42, 300)
         drb_m(-55, 350)
         rmkmove(100, -700)#Flagge abwerfen
