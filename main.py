@@ -60,11 +60,9 @@ def rmkmove(distance, speed):
         rmk.run(speed)
     rmk.brake()
 
-def drb_m(distance,speed,acceleration=900,second_function = None,dist2=0,speed2=0):
+def drb_m(distance,speed,acceleration=900):
     drb.settings(speed,acceleration,90, 500)
-    drb.straight(distance,Stop.HOLD,False)
-    if second_function:
-        second_function(dist2,speed2)
+    drb.straight(distance,Stop.HOLD,True)
     while not drb.done():
         if Button.RIGHT in hub.buttons.pressed():
             raise StopRun("ENDE")
@@ -72,11 +70,9 @@ def drb_m(distance,speed,acceleration=900,second_function = None,dist2=0,speed2=
             wait(1)
             raise StopRun("ENDE GELÄNDE!")
 
-def drb_t(angle,speed,acceleration=500,second_function = None,dist2=0,speed2=0):
+def drb_t(angle,speed,acceleration=500):
     drb.settings(400,400,speed,acceleration)
-    drb.turn(angle,Stop.HOLD,False)
-    if second_function:
-        second_function(dist2,speed2)
+    drb.turn(angle,Stop.HOLD,True)
     while not drb.done():
         if Button.RIGHT in hub.buttons.pressed():
             raise StopRun("ENDE")
@@ -84,15 +80,10 @@ def drb_t(angle,speed,acceleration=500,second_function = None,dist2=0,speed2=0):
             wait(1)
             raise StopRun("ENDE GELÄNDE!")
 
-def drb_k(radius, angle, speed, acceleration=500, second_function=None, dist2=0, speed2=0):
-    
-    drb.settings(straight_speed=speed, straight_acceleration=acceleration, 
-                turn_rate=100, turn_acceleration=acceleration)
-    
+def drb_k(radius, angle, speed, acceleration=500):
+
+    drb.settings(straight_speed=speed, straight_acceleration=acceleration, turn_rate=100, turn_acceleration=acceleration)
     drb.curve(radius, angle, wait=False)
-    
-    if second_function:
-        second_function(dist2, speed2)
     
     while not drb.done():
         if Button.BLUETOOTH in hub.buttons.pressed():
@@ -281,7 +272,7 @@ def run5():
         drb_t(35, 300)
         rmkmove(220, -400)#Statue rekpnstruieren
         print("A:13")#firebase
-        drb_k(-120, 85, -300)
+        drb_k(-220, 85, -300)
         drb_m(800, 600)
 
         elapsed_time = watch.time()
@@ -317,22 +308,6 @@ def run6():
         lmkmove(7,-900)
         drb_t(100,500)
         drb_m(760,1000)
-
-        '''
-        drb_m(734, 500)
-        drb_t(30, 500)
-        drb_m(170, 400)
-        drb_k(90, 60, 500)
-        drb_m(130, 300)
-        lmkmove(45,-400)
-        rmkmove(220,800)#vorsichtige Bergungsaktion^
-        wait(200)
-        print("A:04")#firebase
-        drb_m_rmk(-170,300, 100, 400)#Lore rüberschieben
-        print("A:03,1")#firebas
-        lmkmove(7,-900)
-        drb_t(100,500)
-        drb_m(760,1000)  '''
 
 
         elapsed_time = watch.time()
@@ -383,22 +358,23 @@ def run8():
         rmg.reset_angle(0)
         drb_m(770, 800)
         drb_t(-42, 500)
-        drb_m(180, 300)#Landkarten enthüllen
-        print("A:2,1")#firebase
-        print("A:2,2")#firebase
+        drb_m(180, 300) #Landkarten enthüllen
+        print("A:2,1")
+        print("A:2,2")
         lmkmove(100, 600)#Mutterboden hochheben
-        print("A:2,3")#firebase
+        print("A:2,3")
         drb_m(-110, 500)
         drb_t(42, 300)
         drb_m(-55, 350)
         rmkmove(100, -700)#Flagge abwerfen
-        print("A:15,2")#firebase
+        print("A:15,2")
         drb_m(-115, 150)
         wait(500)
         lmkmove(500, 800)#Pinsel Gefangen
-        print("A:1")#firebase
+        rmg.run(-100)
+        print("A:1")
         lmkmove(350, -600)  
-        drb_k(-375, -86, 800)
+        drb_k(-380, -85, 800)
        
         drb.stop()
         lmk.brake()
@@ -427,8 +403,6 @@ def run9():
         wait(500)
         print("A:14")#firebase
         drb_m(-250, 900)
-        #rmkmove(600, 900)
-        #drb_m(-50, 900)
         drb.stop()
         drb.stop()
         lmk.brake()
@@ -512,28 +486,23 @@ while True:
         elif var == 0:
             run0()
     except StopRun as e:
-        # If a caller explicitly requested stopping the whole program, exit.
         if getattr(e, 'stop_program', False):
             if getattr(e, 'message', ''):
                 print("Stopping program:", e.message)
             else:
                 print("Stopping program")
             
-            # Falls die Session noch läuft, beende sie
             if session_watch is not None:
                 total_time = session_watch.time()
                 print("2_30 stop!,", total_time / 1000)
                 session_watch = None
             
             break
-
-        # Otherwise, only stop the current run and return to the menu.
         if getattr(e, 'message', ''):
             print("Run stopped:", e.message)
         else:
             print("Run stopped")
             
-        # Wenn während einer Session gestoppt wird
         if session_watch is not None:
             total_time = session_watch.time()
             print("run stop!,", total_time / 1000)
