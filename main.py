@@ -203,7 +203,7 @@ def run3():
         drb_m(165, 800)
         drb_t(45, 700)
         drb_m(330, 800)
-        rmkmove(380, 800)#Aktuelle Angebote hochheben
+        rmkmove(400, 900)#Aktuelle Angebote hochheben
         print("A:09")#firebase
         wait(200)
         lmkmove(110, -1000)
@@ -234,16 +234,16 @@ def run4():
         lmg.reset_angle(0)
         rmg.reset_angle(0)
         drb_m(420,400)
-        rmkmove(55,-800)#Mehr runter damit er beim hochgehen nicht immer dagegenhaut
-        rmkmove(40,800)
-        wait(200)
-        rmkmove(40,-800)
-        rmkmove(40,800)
-        wait(200)
-        rmkmove(40,-800)
+        rmkmove(70,-800)#Mehr runter damit er beim hochgehen nicht immer dagegenhaut
+        rmkmove(50,800)
+        wait(300)
+        rmkmove(50,-800)
+        rmkmove(50,800)
+        wait(100)
+        rmkmove(50,-800)
         rmkmove(40,-800)
         print("A:08")#firebase
-        drb_m(-360,400)
+        drb_k(-1000, -20, 800)
 
         elapsed_time = watch.time()
         elapsed_seconds = elapsed_time / 1000
@@ -418,11 +418,17 @@ def run8():
 def run9():
     watch = StopWatch()
     try:
-        drb_m(300, 1000)
-        drb_t(58, 700)
-        drb_m(250, 900)#alles rein schieben
+        drb_m(100, 1000)
+        drb_k(110, 90, 600)
+        drb_m(140, 1000) 
+        drb_k(110, -75, 600) 
+        drb_m(60, 900)#alles rein
+        rmkmove(600, -500)
+        wait(500)
         print("A:14")#firebase
-        drb_m(-300, 900)
+        drb_m(-250, 900)
+        #rmkmove(600, 900)
+        #drb_m(-50, 900)
         drb.stop()
         drb.stop()
         lmk.brake()
