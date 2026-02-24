@@ -29,6 +29,21 @@ radius = 31.2
 drb = DriveBase(lmg, rmg, 62.4, 158)
 drb.use_gyro(True)
 
+# Gyro-Fehler auswerten und bei Abweichung langsamer fahren.
+GYRO_LANGSAM_SCHWELLE_GRAD = 5
+GYRO_LANGSAM_FAKTOR = 0.7
+GYRO_MIN_GESCHWINDIGKEIT = 300
+
+def _abweichung_grad(referenz, aktuell):
+    delta = (aktuell - referenz + 180) % 360 - 180
+    return abs(delta)
+
+def _gyro_angepasste_geschwindigkeit(basis_geschwindigkeit, referenz_ausrichtung):
+    fehler = _abweichung_grad(referenz_ausrichtung, hub.imu.heading())
+    if fehler >= GYRO_LANGSAM_SCHWELLE_GRAD:
+        return max(GYRO_MIN_GESCHWINDIGKEIT, basis_geschwindigkeit * GYRO_LANGSAM_FAKTOR)
+    return basis_geschwindigkeit
+
 
 #Firebase startinfos
 print("restart")
@@ -63,14 +78,21 @@ def rmkmove(distance, speed):
 def drb_m(distance,speed,acceleration=900):
     if speed > 900:
         speed = 900
-    drb.settings(speed,acceleration,90, 500)
-    drb.straight(distance,Stop.HOLD,True)
+    referenz_ausrichtung = hub.imu.heading()
+    aktuelle_geschwindigkeit = speed
+    drb.settings(aktuelle_geschwindigkeit,acceleration,90, 500)
+    drb.straight(distance,Stop.HOLD,False)
     while not drb.done():
+        angepasste_geschwindigkeit = _gyro_angepasste_geschwindigkeit(speed, referenz_ausrichtung)
+        if angepasste_geschwindigkeit != aktuelle_geschwindigkeit:
+            aktuelle_geschwindigkeit = angepasste_geschwindigkeit
+            drb.settings(aktuelle_geschwindigkeit,acceleration,90, 500)
         if Button.RIGHT in hub.buttons.pressed():
             raise StopRun("ENDE")
         if Button.CENTER in hub.buttons.pressed():
             wait(1)
             raise StopRun("ENDE GELÄNDE!")
+        wait(10)
 
 def drb_t(angle,speed,acceleration=500):
     drb.settings(400,400,speed,acceleration)
@@ -97,12 +119,18 @@ def drb_k(radius, angle, speed, acceleration=500):
         wait(10)
 
 def drb_m_rmk(distance, speed, rmk_angle, rmk_speed):
-    drb.settings(speed, 900, 90, 500)
+    referenz_ausrichtung = hub.imu.heading()
+    aktuelle_geschwindigkeit = speed
+    drb.settings(aktuelle_geschwindigkeit, 900, 90, 500)
     drb.straight(distance, Stop.HOLD, False)
     
     rmk.reset_angle(0)
     
     while not drb.done():
+        angepasste_geschwindigkeit = _gyro_angepasste_geschwindigkeit(speed, referenz_ausrichtung)
+        if angepasste_geschwindigkeit != aktuelle_geschwindigkeit:
+            aktuelle_geschwindigkeit = angepasste_geschwindigkeit
+            drb.settings(aktuelle_geschwindigkeit, 900, 90, 500)
         if abs(rmk.angle()) < rmk_angle:
             rmk.run(rmk_speed)
         
@@ -113,6 +141,7 @@ def drb_m_rmk(distance, speed, rmk_angle, rmk_speed):
             rmk.brake()
             wait(1)
             raise StopRun("ENDE GELÄNDE!")
+        wait(10)
     
     rmk.brake()
 
