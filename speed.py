@@ -76,8 +76,7 @@ def rmkmove(distance, speed):
     rmk.brake()
 
 def drb_m(distance,speed,acceleration=900):
-    if speed > 900:
-        speed = 900
+    if speed > 900: speed = 900
     referenz_ausrichtung = hub.imu.heading()
     aktuelle_geschwindigkeit = speed
     drb.settings(aktuelle_geschwindigkeit,acceleration,90, 500)
@@ -151,6 +150,7 @@ def run1():
         zeitRun = 20000
         difference = session_watch.time() - zeitRun
         speed = 1+0.01*difference if difference > 0 else 1
+        if speed > 1.5: speed = 1.5
         
         drb_m(100,600*speed)
         drb_k(100,-60,200)
