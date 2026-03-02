@@ -2,7 +2,6 @@ from pybricks.tools import wait, StopWatch, hub_menu
 from pybricks.pupdevices import Motor, ColorSensor, UltrasonicSensor, ForceSensor
 from pybricks.parameters import Button, Color, Direction, Port, Side, Stop
 from pybricks.robotics import DriveBase
-from pybricks.tools import wait, StopWatch, hub_menu
 import math as m
 from pybricks.tools import multitask, run_task
 from pybricks.hubs import PrimeHub
@@ -189,16 +188,17 @@ def run3():
     try:
         lmg.reset_angle(0)
         rmg.reset_angle(0)
-        drb_m(150, 800)
+        drb_m(150, 810)
         drb_t(-90, 700)
         drb_m(165, 800)
         drb_t(45, 700)
         drb_m(330, 800)
         rmkmove(400, 900)#Aktuelle Angebote hochheben
         print("A:09")#firebase
+        drb_m(-10, 500)
         wait(200)
-        lmkmove(110, -1000)
-        lmkmove(120, 1000)
+        lmkmove(110, -500)
+        lmkmove(120, 500)
         drb_m_rmk(-170, 1000, 500, -250)
         print("A:04")#firebase
         drb_m(40, 800)
@@ -272,7 +272,7 @@ def run5():
         drb_t(35, 300)
         rmkmove(220, -400)#Statue rekpnstruieren
         print("A:13")#firebase
-        drb_k(-120, 85, -300)
+        drb_k(-100, 85, -300)
         drb_m(800, 600)
 
         elapsed_time = watch.time()
@@ -307,7 +307,23 @@ def run6():
         print("A:03,1")#firebas
         lmkmove(7,-900)
         drb_t(100,500)
-        drb_m(740,1000)
+        drb_m(760,1000)
+
+        '''
+        drb_m(734, 500)
+        drb_t(30, 500)
+        drb_m(170, 400)
+        drb_k(90, 60, 500)
+        drb_m(130, 300)
+        lmkmove(45,-400)
+        rmkmove(220,800)#vorsichtige Bergungsaktion^
+        wait(200)
+        print("A:04")#firebase
+        drb_m_rmk(-170,300, 100, 400)#Lore rüberschieben
+        print("A:03,1")#firebas
+        lmkmove(7,-900)
+        drb_t(100,500)
+        drb_m(760,1000)  '''
 
 
         elapsed_time = watch.time()
@@ -370,12 +386,10 @@ def run8():
         print("A:15,2")
         drb_m(-115, 150)
         wait(500)
-        lmkmove(500, 800)#Pinsel Gefangen
-        rmg.run(-100)
-        print("A:1")
-        lmkmove(400, -600)
-        wait(200)  
-        drb_m(-550, 800)
+        lmkmove(430, 800)#Pinsel Gefangen
+        print("A:1")#firebase
+        lmkmove(400, -600)  
+        drb_k(-1400, -20, 800)
        
         drb.stop()
         lmk.brake()
@@ -437,6 +451,27 @@ def run9():
 
 def run0():
     try:
+        drb_k(900, -50, 500)
+        drb_m(100, 500)
+        drb_t(-40, 500)
+        drb_m(255, 500)
+        drb_t(90, 500)
+        drb_m(200, 1000)
+        rmkmove(320, -310)#ayyana klauen
+        wait(500)
+        drb_m(-80, 1000)
+        rmkmove(170, 200)
+        rmkmove(150, 150)
+        drb_m(-80, 1000)
+        wait(500)
+        drb_t(180, 100)
+        drb_m(-20, 500)
+        lmkmove(200, -800)  #Flagge aufstellen - Ändern!
+        drb_m(50, 500)
+        drb_t(-90, 100)
+        drb_m(275, 500)
+        drb_t(55,100)
+        drb_m(750, 500)
         print("restart")#firebase
         print("battery",hub.battery.voltage() / 1000)
     except StopRun as e:
